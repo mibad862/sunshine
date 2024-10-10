@@ -4,6 +4,7 @@ import 'package:sunshine_app/components/footer.dart';
 import 'package:sunshine_app/components/header.dart';
 import 'package:sunshine_app/components/visibility_wrapper.dart';
 import 'package:sunshine_app/controller/ipad15_controller.dart';
+import 'package:sunshine_app/view/ipad12.dart';
 import 'package:sunshine_app/view/ipad16.dart';
 
 class Ipad15 extends StatefulWidget {
@@ -41,12 +42,7 @@ class _Ipad15State extends State<Ipad15> {
               SizedBox(
                 height: 30.0,
               ),
-              Header(
-                navigation: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => Ipad16()));
-                },
-              ),
+              
 
               SizedBox(
                 height: 20.0,

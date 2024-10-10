@@ -111,7 +111,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
               ),
             ),
           ),
-          SizedBox(height: 20),
+        //  SizedBox(height: 20),
       
           // Numeric keypad (1-9)
           Expanded(
@@ -120,15 +120,15 @@ class _PasswordScreenState extends State<PasswordScreen> {
               children: [
                 // First Row of Digits
                 _buildButtonRow(['1', '2', '3']),
-                const SizedBox(height: 20),
+               // const SizedBox(height: 20),
       
                 // Second Row of Digits
                 _buildButtonRow(['4', '5', '6']),
-                const SizedBox(height: 20),
+               // const SizedBox(height: 20),
       
                 // Third Row of Digits
                 _buildButtonRow(['7', '8', '9']),
-                const SizedBox(height: 50),
+               // const SizedBox(height: 50),
       
                 // Cancel Button (acting as backspace)
                 Row(

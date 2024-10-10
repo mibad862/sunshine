@@ -86,10 +86,11 @@ class CustomerController extends ChangeNotifier {
   }
 
   // Set the selected time
-  Future<void> setSelectedTime(String time) async {
-    _selectedTime = time;
-    notifyListeners();
-  }
+ void setSelectedTime(String time) {
+  _selectedTime = time;
+  notifyListeners();
+}
+
 
 // Method to load cached customer names from Shared Preferences
   Future<void> _loadCachedCustomerNames() async {

@@ -23,41 +23,26 @@ class _Ipad12State extends State<Ipad12> {
   int minute = 0;
   bool isLoading = false;
 
-void _setTimeAndNavigate(CustomerController controller, String time) async {
-  log('Setting time: $time');
-  
-  // Start loading and update the state
-  setState(() {
-    isLoading = true; 
-  });
+  void _setTimeAndNavigate(CustomerController controller, String time) {
+    log('Setting time: $time');
 
-  try {
-    // Set selected time
-    await controller.setSelectedTime(time);
+    try {
+      // Set selected time
+      controller.setSelectedTime(time);
 
-    // Navigate based on selected customer
-    if (controller.selectedNameId == '1') {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => Ipad14()));
-    } else if (controller.selectedNameId == '3') {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => Ipad15()));
+      // Navigate based on selected customer
+      if (controller.selectedNameId == '1') {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => Ipad14()));
+      } else if (controller.selectedNameId == '3') {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => Ipad15()));
+      }
+    } catch (e) {
+      log('Error occurred during navigation: $e');
+      // Show error feedback to the user (optional)
     }
-  } catch (e) {
-    log('Error occurred during navigation: $e');
-    // Show error feedback to the user (optional)
-  } finally {
-    // Stop loading and update the state
-    setState(() {
-      isLoading = false; 
-    });
   }
-}
-
-
-
-
-
-
- 
 
   // Increment/decrement functions for hours and minutes
   void incrementHour() {
@@ -108,32 +93,30 @@ void _setTimeAndNavigate(CustomerController controller, String time) async {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Container(
-                    height: 90,
+                 
+                 
+
+
+
+                  TextButton(
+                      onPressed: () {
+                           TimeOfDay currentTime = TimeOfDay.now();
+                        String formattedTime =
+                            '${currentTime.hour}:${currentTime.minute.toString().padLeft(2, '0')}';
+                        log('hehe$formattedTime');
+
+                        controller.setSelectedTime(formattedTime);
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) => Ipad13()));
+                    
+                      },
+                      child: Container(
+                         height: 90,
                     width: 200,
                     decoration: BoxDecoration(
                         color: Colors.yellow,
                         borderRadius: BorderRadius.circular(10.0)),
-                    child: Center(
-                      child: isLoading 
-      ? CircularProgressIndicator() : InkWell(
-                        onTap: ()async {
-                          // Set the current time in 24-hour format
-                          TimeOfDay currentTime = TimeOfDay.now();
-                          String formattedTime =
-                              '${currentTime.hour}:${currentTime.minute.toString().padLeft(2, '0')}';
-                          log('hehe$formattedTime');
-
-                          controller.setSelectedTime(formattedTime);
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => Ipad13()));
-                        },
-                        child: const Text("Now"),
-                      ),
-                    ),
-                  ),
+                        child: Center(child: const Text("Now",style: TextStyle(color: Colors.black),)))),
                   const SizedBox(width: 50.0),
 
                   // Custom Time Input (Hours and Minutes)
@@ -177,47 +160,40 @@ void _setTimeAndNavigate(CustomerController controller, String time) async {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  // Back button
-                  Container(
-                    height: 60,
-                    width: 200,
-                    decoration: BoxDecoration(
-                        color: Colors.yellow,
-                        borderRadius: BorderRadius.circular(10.0)),
-                    child: Center(
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.push(
+                 
+                  TextButton(
+                      onPressed: () {
+                           Navigator.push(
                               context,
                               MaterialPageRoute(
                                   builder: (context) => Ipad11()));
-                        },
-                        child: const Text("Back"),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20.0),
-
-                  // Confirm/Next button
-                  Container(
-                    height: 90,
+                    
+                      },
+                      child: Container(
+                         height: 90,
                     width: 200,
                     decoration: BoxDecoration(
                         color: Colors.yellow,
                         borderRadius: BorderRadius.circular(10.0)),
-                    child: Center(
-                     child: isLoading?CircularProgressIndicator()
-                      :InkWell(
-                        onTap: () async{
-                          // Get the entered time from the input fields
-                          String enteredTime =
-                              '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
-                         _setTimeAndNavigate(controller, enteredTime);
-                        },
-                        child: const Text("Next"),
-                      ),
-                    ),
-                  ),
+                        child: Center(child: const Text("Back",style: TextStyle(color: Colors.black),)))),
+                  const SizedBox(height: 20.0),
+
+                
+                  TextButton(
+                      onPressed: () {
+                        // Get the entered time from the input fields
+                        String enteredTime =
+                            '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
+                        log('ha${enteredTime}');
+                        _setTimeAndNavigate(controller, enteredTime);
+                      },
+                      child: Container(
+                         height: 90,
+                    width: 200,
+                    decoration: BoxDecoration(
+                        color: Colors.yellow,
+                        borderRadius: BorderRadius.circular(10.0)),
+                        child: Center(child: const Text("Next",style: TextStyle(color: Colors.black),))))
                 ],
               ),
               const SizedBox(height: 30.0),
