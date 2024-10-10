@@ -3,9 +3,12 @@ import 'package:provider/single_child_widget.dart';
 import 'package:sunshine_app/controller/Vehicle_Movement_controller.dart';
 import 'package:sunshine_app/controller/auth_controller.dart';
 import 'package:sunshine_app/controller/brightness_controller.dart';
+import 'package:sunshine_app/controller/customerResponse_controller.dart';
 import 'package:sunshine_app/controller/datetime_controller.dart';
 import 'package:sunshine_app/controller/driver_portal_controller.dart';
 import 'package:sunshine_app/controller/home_controller.dart';
+import 'package:sunshine_app/controller/ipad14_controller.dart';
+import 'package:sunshine_app/controller/ipad15_controller.dart';
 import 'package:sunshine_app/controller/ipad16_controller.dart';
 import 'package:sunshine_app/controller/theme_controller.dart';
 import 'package:sunshine_app/controller/visibility_controller.dart';
@@ -20,6 +23,10 @@ class MultiProviderClass {
         ChangeNotifierProvider(create: (context) => ThemeController()),
         ChangeNotifierProvider(create: (context) => BrightnessController()),
         ChangeNotifierProvider(create: (context) => VisibilityController()),
+        ChangeNotifierProvider(create: (context) => CustomerController()),
+        ChangeNotifierProvider(create: (context) =>VLineController()),
+        ChangeNotifierProvider(create: (context) =>MetroLineController()),
+
         ChangeNotifierProvider(
             create: (context) => VehicleMovementController()),
        ChangeNotifierProvider(
