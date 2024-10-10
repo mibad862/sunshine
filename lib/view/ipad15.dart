@@ -95,12 +95,14 @@ class _Ipad15State extends State<Ipad15> {
                           itemCount: controller.metroLineResponse!.customers.length,
                           itemBuilder: (context, index) {
                             final customer = controller.metroLineResponse!.customers[index];
-                            return GestureDetector(
+                            return
+                             GestureDetector(
                               onTap: () {
                                 controller.setSelectedNameId(customer.id); // Handle customer selection
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Selected: ${customer.name}')),
-                                );
+                                   Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => Ipad16()));
                               },
                               child: Container(
                                 margin: const EdgeInsets.symmetric(
@@ -121,6 +123,7 @@ class _Ipad15State extends State<Ipad15> {
                                 ),
                               ),
                             );
+                                
                           },
                         );
                       }

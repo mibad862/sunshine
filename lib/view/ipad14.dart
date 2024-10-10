@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:sunshine_app/components/footer.dart';
 import 'package:sunshine_app/components/visibility_wrapper.dart';
 import 'package:sunshine_app/controller/ipad14_controller.dart';
+import 'package:sunshine_app/view/ipad16.dart';
 
 class Ipad14 extends StatefulWidget {
   const Ipad14({super.key});
@@ -79,39 +80,50 @@ class _Ipad14State extends State<Ipad14> {
                       } else {
                         // Display the list of customers
                         return GridView.builder(
-                          gridDelegate:  const SliverGridDelegateWithFixedCrossAxisCount(
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 3, // 3 items per row
                             crossAxisSpacing: 5.0, // Space between columns
                             mainAxisSpacing: 5.0, // Space between rows
-                            childAspectRatio: 3, // Adjust the ratio to fit your design
+                            childAspectRatio:
+                                3, // Adjust the ratio to fit your design
                           ),
-                          itemCount: vLineController.vLineResponse!.customers.length,
+                          itemCount:
+                              vLineController.vLineResponse!.customers.length,
                           itemBuilder: (context, index) {
-                            final customer = vLineController.vLineResponse!.customers[index];
-                            return GestureDetector(
-                              onTap: () {
-                                vLineController.setSelectedNameId(customer.id); // Handle customer selection
-                               
-                              },
-                              child: Container(
-                                margin: const EdgeInsets.symmetric(
-                                    vertical: 8.0, horizontal: 20.0),
-                                padding: const EdgeInsets.all(16.0),
-                                decoration: BoxDecoration(
-                                  color: Colors.yellow.withOpacity(0.5),
-                                  borderRadius: BorderRadius.circular(20.0),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    customer.name,
-                                    style: const TextStyle(
-                                      fontSize: 18.0,
-                                      fontWeight: FontWeight.bold,
+                            final customer =
+                                vLineController.vLineResponse!.customers[index];
+                            return
+                                GestureDetector(
+                                  onTap: () {
+                                    vLineController.setSelectedNameId(customer.id); // Handle customer selection 
+                                    
+                                      Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => Ipad16()));
+
+                                  },
+                                  child: Container(
+                                    margin: const EdgeInsets.symmetric(
+                                        vertical: 8.0, horizontal: 20.0),
+                                    padding: const EdgeInsets.all(16.0),
+                                    decoration: BoxDecoration(
+                                      color: Colors.yellow.withOpacity(0.5),
+                                      borderRadius: BorderRadius.circular(20.0),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        customer.name,
+                                        style: const TextStyle(
+                                          fontSize: 18.0,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ),
-                            );
+                                );
+                             
                           },
                         );
                       }
