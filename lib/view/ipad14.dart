@@ -15,11 +15,14 @@ class Ipad14 extends StatefulWidget {
 class _Ipad14State extends State<Ipad14> {
   @override
   void initState() {
-    super.initState();
+    
+  
     // Fetch VLine data when the widget is initialized
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<VLineController>(context, listen: false).getVlines();
+      
     });
+      super.initState();
   }
 
   @override

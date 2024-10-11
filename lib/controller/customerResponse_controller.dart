@@ -19,7 +19,7 @@ class CustomerController extends ChangeNotifier {
 
   // Function to get customers
   // Function to get customers
-  Future<void> getCustomers(BuildContext context) async {
+  Future<void> getCustomers() async {
     isLoading = true;
     errorMessage = null; // Reset error message
     notifyListeners(); // Notify listeners about the loading state
@@ -39,7 +39,6 @@ class CustomerController extends ChangeNotifier {
       // Parsing the API response
       if (response["status"] == "success") {
         customerResponse = CustomerResponse.fromJson(response);
-        notifyListeners(); // Notify listeners about the data change
 
         // Store customer IDs and names
         await _storeCustomerIdsAndNames();
@@ -51,12 +50,10 @@ class CustomerController extends ChangeNotifier {
       errorMessage = "An error occurred: $e";
       log('Error in getCustomers API: $e');
       await _loadCachedCustomerNames();
-    } finally {
-      isLoading = false;
-      if (context.mounted) {
-        notifyListeners(); // Notify listeners about the loading completion if context is still mounted
-      }
     }
+    isLoading = false;
+
+    notifyListeners(); // Notify listeners about the loading completion if context is still mounted
   }
 
   // Private method to extract and store customer IDs and Names
@@ -86,11 +83,10 @@ class CustomerController extends ChangeNotifier {
   }
 
   // Set the selected time
- void setSelectedTime(String time) {
-  _selectedTime = time;
-  notifyListeners();
-}
-
+  void setSelectedTime(String time) {
+    _selectedTime = time;
+    notifyListeners();
+  }
 
 // Method to load cached customer names from Shared Preferences
   Future<void> _loadCachedCustomerNames() async {

@@ -19,13 +19,17 @@ class Ipad11 extends StatefulWidget {
 class _Ipad11State extends State<Ipad11> {
   @override
   void initState() {
-    super.initState();
+   
     // Call getCustomers after the first frame is rendered
     WidgetsBinding.instance.addPostFrameCallback((_) {
  // Assuming you want to fetch customers when the widget is initialized
   final controller = Provider.of<CustomerController>(context, listen: false);
-  controller.getCustomers(context); // Pass the context here
+  controller.getCustomers(); // Pass the context here
     });
+
+    //  final controller = Provider.of<CustomerController>(context, listen: false);
+    //   controller.getCustomers();
+       super.initState();
   }
 
     @override
