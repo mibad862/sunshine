@@ -1,155 +1,241 @@
-
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sunshine_app/components/footer.dart';
-import 'package:sunshine_app/components/header.dart';
 import 'package:sunshine_app/components/visibility_wrapper.dart';
+import 'package:sunshine_app/controller/customerResponse_controller.dart';
+import 'package:sunshine_app/view/ipad11.dart';
 import 'package:sunshine_app/view/ipad13.dart';
-class Ipad12 extends StatelessWidget {
+import 'package:sunshine_app/view/ipad14.dart';
+import 'package:sunshine_app/view/ipad15.dart';
+
+class Ipad12 extends StatefulWidget {
   const Ipad12({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return  VisibilityWrapper(bodyScreen: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(height: 30.0,),
-       Header(
-  navigation: () {
-    Navigator.push(
-      context, 
-      MaterialPageRoute(builder: (context) => Ipad13())
-    );
-  },
-),
-
-        SizedBox(height: 20.0,),
-        Text("EMERGENCY CALL OUT",style: TextStyle(fontSize: 24.0),),
-         SizedBox(height: 20.0,),
-        Text("When did the call-out begin?",style: TextStyle(fontSize: 20.0,color: Colors.green),),
-          SizedBox(height: 20.0,),
-         Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Row(
-                   mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                     Container(height: 90,width: 200,
-                          decoration: BoxDecoration(
-                            color: Colors.yellow,
-                            borderRadius: BorderRadius.circular(10.0)
-                          ),
-                          child: const Center(child: Text("Now"),),
-                          ),
-                          SizedBox(width: 50.0,),
-                     SizedBox(
-                                     width: 500, // Increased width to accommodate spacing
-                                     height: 200,
-                                     child: CustomPaint(
-                      painter: OdometerSmallPainter(),
-                                     ),
-                                   ),
-                    ],
-                  ),
-                      SizedBox(height: MediaQuery.sizeOf(context).height*.25,),
-                  Row(
-                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                          
-                          Container(height: 60,width: 200,
-                          decoration: BoxDecoration(
-                            color: Colors.yellow,
-                            borderRadius: BorderRadius.circular(10.0)
-                          ),
-                          child: const Center(
-                            child: Text("Back"),
-                          ),
-                          ),
-                          const SizedBox(height: 20.0,),
-                          Container(height: 90,width: 200,
-                          decoration: BoxDecoration(
-                            color: Colors.yellow,
-                            borderRadius: BorderRadius.circular(10.0)
-                          ),
-                          child: const Center(child: Text("Confirm"),),
-                          ),
-                          const SizedBox(width: 100.0,),
-                  ],),
-                ],
-              ),
-              SizedBox(height: MediaQuery.sizeOf(context).height*.06,),
-
-        Footer(isShowSettings: true)
-      ],
-    ),);
-  }
+  State<Ipad12> createState() => _Ipad12State();
 }
 
-class OdometerSmallPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    // Paint object for red triangles
-    final trianglePaint = Paint()
-      ..color = Colors.blue.withOpacity(0.7) // Red for triangles
-      ..strokeWidth = 2
-      ..style = PaintingStyle.fill;
+class _Ipad12State extends State<Ipad12> {
+  // Variables for hours and minutes
+  int hour = 0;
+  int minute = 0;
+  bool isLoading = false;
 
-    // Paint object for yellow boxes
-    final boxPaint = Paint()
-      ..color = Colors.green // Yellow for boxes
-      ..strokeWidth = 2
-      ..style = PaintingStyle.fill;
+  void _setTimeAndNavigate(CustomerController controller, String time) {
+    log('Setting time: $time');
 
-    final triangleHeight = size.height / 4;
-    final triangleWidth = size.width / 7;
-    final containerHeight = size.height / 4;
-    final spacing = 10.0; // Spacing between triangles and boxes
+    try {
+      // Set selected time
+      controller.setSelectedTime(time);
 
-    // Adjusted triangle width for spacing
-    final adjustedWidth = (size.width - (6 * spacing)) / 7;
-
-    // Drawing top triangles (with spacing)
-    for (int i = 0; i < 4; i++) {
-      final path = Path();
-      final startX = i * (adjustedWidth + spacing);
-      path.moveTo(startX + adjustedWidth / 2, 0); // Top center
-      path.lineTo(startX, triangleHeight);         // Bottom left
-      path.lineTo(startX + adjustedWidth, triangleHeight); // Bottom right
-      path.close();
-      canvas.drawPath(path, trianglePaint); // Use trianglePaint for red triangles
-    }
-
-    // Drawing containers (with spacing)
-    for (int i = 0; i < 4; i++) {
-      final startX = i * (adjustedWidth + spacing);
-      final rect = Rect.fromLTWH(
-        startX,
-        triangleHeight + spacing, // Spacing below the top triangles
-        adjustedWidth,
-        containerHeight,
-      );
-      canvas.drawRect(rect, boxPaint); // Use boxPaint for yellow boxes
-    }
-
-    // Drawing bottom triangles (with spacing)
-    // Adding similar spacing below the containers like the top triangles
-    for (int i = 0; i < 4; i++) {
-      final path = Path();
-      final startX = i * (adjustedWidth + spacing);
-      // The bottom triangles should start after the containers, with added spacing
-      final bottomYStart = triangleHeight + spacing + containerHeight + spacing; 
-
-      path.moveTo(startX + adjustedWidth / 2, bottomYStart + triangleHeight); // Bottom center of the triangle
-      path.lineTo(startX, bottomYStart);    // Top left of the triangle
-      path.lineTo(startX + adjustedWidth, bottomYStart); // Top right of the triangle
-      path.close();
-      canvas.drawPath(path, trianglePaint); // Use trianglePaint for red triangles
+      // Navigate based on selected customer
+      if (controller.selectedNameId == '1') {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => Ipad14()));
+      } else if (controller.selectedNameId == '3') {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => Ipad15()));
+      }
+    } catch (e) {
+      log('Error occurred during navigation: $e');
+      // Show error feedback to the user (optional)
     }
   }
 
+  // Increment/decrement functions for hours and minutes
+  void incrementHour() {
+    setState(() {
+      if (hour < 23) hour++;
+    });
+  }
+
+  void decrementHour() {
+    setState(() {
+      if (hour > 0) hour--;
+    });
+  }
+
+  void incrementMinute() {
+    setState(() {
+      if (minute < 59) minute++;
+    });
+  }
+
+  void decrementMinute() {
+    setState(() {
+      if (minute > 0) minute--;
+    });
+  }
+
   @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    return false;
-  
+  Widget build(BuildContext context) {
+    return VisibilityWrapper(
+      bodyScreen: Consumer<CustomerController>(
+        builder: (context, controller, child) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 30.0),
+              const Text(
+                "EMERGENCY CALL OUT",
+                style: TextStyle(fontSize: 24.0),
+              ),
+              const SizedBox(height: 20.0),
+              const Text(
+                "When did the call-out begin?",
+                style: TextStyle(fontSize: 20.0, color: Colors.green),
+              ),
+              const SizedBox(height: 20.0),
+
+              // Now button to set current time
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                 
+                 
+
+
+
+                  TextButton(
+                      onPressed: () {
+                           TimeOfDay currentTime = TimeOfDay.now();
+                        String formattedTime =
+                            '${currentTime.hour}:${currentTime.minute.toString().padLeft(2, '0')}';
+                        log('hehe$formattedTime');
+
+                        controller.setSelectedTime(formattedTime);
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) => Ipad13()));
+                    
+                      },
+                      child: Container(
+                         height: 90,
+                    width: 200,
+                    decoration: BoxDecoration(
+                        color: Colors.yellow,
+                        borderRadius: BorderRadius.circular(10.0)),
+                        child: Center(child: const Text("Now",style: TextStyle(color: Colors.black),)))),
+                  const SizedBox(width: 50.0),
+
+                  // Custom Time Input (Hours and Minutes)
+                  SizedBox(
+                    width: 250,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Hours input with custom UI
+                        _buildTimeAdjuster(
+                          value: hour,
+                          label: 'HH',
+                          onIncrement: incrementHour,
+                          onDecrement: decrementHour,
+                        ),
+                        const SizedBox(width: 10.0),
+                        // Minutes input with custom UI
+                        _buildTimeAdjuster(
+                          value: minute,
+                          label: 'MM',
+                          onIncrement: incrementMinute,
+                          onDecrement: decrementMinute,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20.0),
+
+              // Display selected customer name
+              Text(
+                controller.selectedNameId.isNotEmpty
+                    ? 'Selected Customer: ${controller.selectedNameId}'
+                    : "No customer selected",
+                style: const TextStyle(color: Colors.black, fontSize: 17),
+              ),
+              const SizedBox(height: 30.0),
+
+              // Navigation buttons (Back and Confirm/Next)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                 
+                  TextButton(
+                      onPressed: () {
+                           Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => Ipad11()));
+                    
+                      },
+                      child: Container(
+                         height: 90,
+                    width: 200,
+                    decoration: BoxDecoration(
+                        color: Colors.yellow,
+                        borderRadius: BorderRadius.circular(10.0)),
+                        child: Center(child: const Text("Back",style: TextStyle(color: Colors.black),)))),
+                  const SizedBox(height: 20.0),
+
+                
+                  TextButton(
+                      onPressed: () {
+                        // Get the entered time from the input fields
+                        String enteredTime =
+                            '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
+                        log('ha${enteredTime}');
+                        _setTimeAndNavigate(controller, enteredTime);
+                      },
+                      child: Container(
+                         height: 90,
+                    width: 200,
+                    decoration: BoxDecoration(
+                        color: Colors.yellow,
+                        borderRadius: BorderRadius.circular(10.0)),
+                        child: Center(child: const Text("Next",style: TextStyle(color: Colors.black),))))
+                ],
+              ),
+              const SizedBox(height: 30.0),
+              Footer(isShowSettings: true)
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  // Custom widget to build time adjuster for hours and minutes
+  Widget _buildTimeAdjuster({
+    required int value,
+    required String label,
+    required Function onIncrement,
+    required Function onDecrement,
+  }) {
+    return Column(
+      children: [
+        IconButton(
+          icon: Icon(Icons.arrow_drop_up, size: 40),
+          onPressed: () => onIncrement(),
+        ),
+        Container(
+          width: 60,
+          height: 60,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: Text(
+            value.toString().padLeft(2, '0'),
+            style: TextStyle(fontSize: 30),
+          ),
+        ),
+        IconButton(
+          icon: Icon(Icons.arrow_drop_down, size: 40),
+          onPressed: () => onDecrement(),
+        ),
+      ],
+    );
   }
 }

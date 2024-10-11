@@ -5,7 +5,7 @@ import 'package:sunshine_app/components/footer.dart';
 import 'package:sunshine_app/components/header.dart';
 import 'package:sunshine_app/components/visibility_wrapper.dart';
 import 'package:sunshine_app/controller/driver_portal_controller.dart';
-import 'package:sunshine_app/view/ipad4.dart';
+import 'package:sunshine_app/view/ipad11.dart';
 
 class UserStatus extends StatefulWidget {
   const UserStatus({super.key});
@@ -40,7 +40,7 @@ class _UserStatusState extends State<UserStatus> {
   navigation: () {
     Navigator.push(
       context, 
-      MaterialPageRoute(builder: (context) => Ipad4())
+      MaterialPageRoute(builder: (context) => Ipad11())
     );
   },
 ),
