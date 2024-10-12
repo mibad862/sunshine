@@ -1,10 +1,9 @@
-import 'dart:developer';
+import 'dart:convert'; // Needed for json encoding and decoding
 import 'package:flutter/material.dart';
-import 'package:nb_utils/nb_utils.dart';
+import 'package:http/http.dart' as http; // Import the http package
+import 'package:nb_utils/nb_utils.dart'; // For shared preferences or toast
 import 'package:sunshine_app/models/customerResponse_model.dart';
 import 'package:sunshine_app/pref/prefUtils.dart';
-
-import 'package:sunshine_app/services/api_service.dart';
 
 class CustomerController extends ChangeNotifier {
   bool isLoading = false;
@@ -12,51 +11,88 @@ class CustomerController extends ChangeNotifier {
   String _selectedNameId = '';
   String _selectedTime = '';
   String? errorMessage; // For error handling
+
   // Getter for selectedName
   String get selectedNameId => _selectedNameId;
+
   // Getter for selectedTime
   String get selectedTime => _selectedTime;
+  final String serverKey = "3d41895d9c88b284a88103da2ab45cc5";
+  final String authToken = getStringAsync('auth_token');
 
   // Function to get customers
-  // Function to get customers
   Future<void> getCustomers() async {
+    if (authToken == null || authToken.isEmpty) {
+      errorMessage = "Authentication token is missing.";
+      toast(errorMessage);
+      return;
+    }
+
     isLoading = true;
     errorMessage = null; // Reset error message
     notifyListeners(); // Notify listeners about the loading state
 
+    log(authToken);
+
+    // API endpoint URL
+    String url = 'https://api.g00r.com.au/API/getCustomers';
+
+    // Request headers
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $authToken',
+      'Content-Type': 'application/json',
+      'Accept': '*/*',
+    };
+
+    // Request body
+    Map<String, dynamic> body = {
+      'serverKey': serverKey,
+    };
+
     try {
-      final response = await apiService.callPostApi(
-        apiPath: 'getCustomers',
-        apiData: {},
+      // Make HTTP POST request
+      final response = await http.post(
+        Uri.parse(url),
+        headers: headers,
+        body: jsonEncode(body), // Encode the body to JSON format
       );
 
-      log('getCustomers API called with response: $response');
+      // Parse the response
+      if (response.statusCode == 200) {
+        var responseData = jsonDecode(response.body);
+        log('Response: $responseData');
 
-      if (response == null) {
-        throw Exception('Invalid API response');
-      }
-
-      // Parsing the API response
-      if (response["status"] == "success") {
-        customerResponse = CustomerResponse.fromJson(response);
-
-        // Store customer IDs and names
-        await _storeCustomerIdsAndNames();
+        if (responseData["status"] == "success") {
+          toast(responseData['message']);
+          customerResponse = CustomerResponse.fromJson(responseData);
+          await _storeCustomerIdsAndNames();
+        } else {
+          log(responseData['message']);
+          toast(responseData['message']);
+          errorMessage = "Failed to fetch customers.";
+        }
+      } else if (response.statusCode == 401) {
+        errorMessage = "Unauthorized request. Please check your token.";
+        toast(errorMessage);
+      } else if (response.statusCode == 500) {
+        errorMessage = "Server error. Please try again later.";
+        toast(errorMessage);
       } else {
-        errorMessage = "Failed to fetch customers.";
-        log("Something went wrong!!! Response: $response");
+        errorMessage = "Unexpected error occurred. Status code: ${response.statusCode}";
+        toast(errorMessage);
       }
     } catch (e) {
+      log('Error: $e');
+      toast("An error occurred: $e");
       errorMessage = "An error occurred: $e";
-      log('Error in getCustomers API: $e');
       await _loadCachedCustomerNames();
     }
-    isLoading = false;
 
-    notifyListeners(); // Notify listeners about the loading completion if context is still mounted
+    isLoading = false;
+    notifyListeners(); // Notify listeners about the loading completion
   }
 
-  // Private method to extract and store customer IDs and Names
+  // Method to store customer IDs and Names
   Future<void> _storeCustomerIdsAndNames() async {
     if (customerResponse != null && customerResponse!.customers.isNotEmpty) {
       List<String> customerIds = [];
@@ -67,37 +103,30 @@ class CustomerController extends ChangeNotifier {
         customerNames.add(customer.name);
       }
 
-      // Store the lists in Shared Preferences using nb_utils
       await setValue(PrefKeys.customerIds, customerIds);
       await setValue(PrefKeys.customerNames, customerNames);
-
-      log('Customer IDs and Names stored in Shared Preferences.');
     }
   }
 
-  // **New Method:** Set Selected Customer Name
+  // Set Selected Customer Name
   Future<void> setSelectedNameId(String name) async {
     _selectedNameId = name;
-    //log('Selected Customer Name: $selectedName');
     notifyListeners();
   }
 
-  // Set the selected time
+  // Set selected time
   void setSelectedTime(String time) {
     _selectedTime = time;
     notifyListeners();
   }
 
-// Method to load cached customer names from Shared Preferences
+  // Load cached customer names from Shared Preferences
   Future<void> _loadCachedCustomerNames() async {
-    List<String> cachedCustomerIds =
-        getStringListAsync(PrefKeys.customerIds) ?? [];
-    List<String> cachedCustomerNames =
-        getStringListAsync(PrefKeys.customerNames) ?? [];
+    List<String> cachedCustomerIds = getStringListAsync(PrefKeys.customerIds) ?? [];
+    List<String> cachedCustomerNames = getStringListAsync(PrefKeys.customerNames) ?? [];
 
     if (cachedCustomerIds.isNotEmpty && cachedCustomerNames.isNotEmpty) {
-      List<Customer> cachedCustomers =
-          List.generate(cachedCustomerIds.length, (index) {
+      List<Customer> cachedCustomers = List.generate(cachedCustomerIds.length, (index) {
         return Customer(
           id: cachedCustomerIds[index],
           name: cachedCustomerNames[index],
@@ -113,10 +142,8 @@ class CustomerController extends ChangeNotifier {
         customers: cachedCustomers,
       );
 
-      log('Loaded customer names from cache.');
-      notifyListeners(); // Notify listeners about the data change
+      notifyListeners();
     } else {
-      log('No cached customer data available.');
       errorMessage = "No cached data available.";
     }
   }

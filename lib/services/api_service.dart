@@ -7,7 +7,7 @@ import 'package:sunshine_app/services/dio_service.dart';
 final ApiService apiService = ApiService();
 
 class ApiService {
-    String authToken=getStringAsync('auth_token');
+  String authToken = getStringAsync('auth_token');
   // Map header = {'Authorization': 'Bearer $authToken'};
 
   static final ApiService _instance = ApiService._internal();
@@ -23,9 +23,12 @@ class ApiService {
       String url = apiPath;
       apiData['serverKey'] = serverKey;
       Response response = await dioService.dio.post(
-
         url,
-        options: Options(headers:  {'Authorization': 'Bearer $authToken'}),
+        options: Options(headers: {
+          'Authorization': 'Bearer $authToken',
+          'Content-Type': 'application/json',
+          'Accept': '*/*',
+        }),
         data: apiData,
         cancelToken: cancelToken ?? AppConstants.cancelToken,
       );
