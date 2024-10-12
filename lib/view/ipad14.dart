@@ -15,20 +15,21 @@ class Ipad14 extends StatefulWidget {
 class _Ipad14State extends State<Ipad14> {
   @override
   void initState() {
-    super.initState();
+    
+  
     // Fetch VLine data when the widget is initialized
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<VLineController>(context, listen: false).getVlines();
+      
     });
+      super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return VisibilityWrapper(
       bodyScreen: Scaffold(
-        appBar: AppBar(
-          title: const Text('V/Line Selection'),
-        ),
+       
         body: Consumer<VLineController>(
           builder: (context, vLineController, child) {
             // Display error messages using SnackBar if there's an error
@@ -44,6 +45,8 @@ class _Ipad14State extends State<Ipad14> {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const Text('V/Line Selection',
+                style: TextStyle(fontSize: 8.0, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 18.0),
                 const Text(
                   "Emergency Call Out",

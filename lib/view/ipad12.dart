@@ -93,14 +93,9 @@ class _Ipad12State extends State<Ipad12> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                 
-                 
-
-
-
                   TextButton(
                       onPressed: () {
-                           TimeOfDay currentTime = TimeOfDay.now();
+                        TimeOfDay currentTime = TimeOfDay.now();
                         String formattedTime =
                             '${currentTime.hour}:${currentTime.minute.toString().padLeft(2, '0')}';
                         log('hehe$formattedTime');
@@ -108,15 +103,18 @@ class _Ipad12State extends State<Ipad12> {
                         controller.setSelectedTime(formattedTime);
                         Navigator.push(context,
                             MaterialPageRoute(builder: (context) => Ipad13()));
-                    
                       },
                       child: Container(
-                         height: 90,
-                    width: 200,
-                    decoration: BoxDecoration(
-                        color: Colors.yellow,
-                        borderRadius: BorderRadius.circular(10.0)),
-                        child: Center(child: const Text("Now",style: TextStyle(color: Colors.black),)))),
+                          height: 90,
+                          width: 200,
+                          decoration: BoxDecoration(
+                              color: Colors.yellow,
+                              borderRadius: BorderRadius.circular(10.0)),
+                          child: Center(
+                              child: const Text(
+                            "Now",
+                            style: TextStyle(color: Colors.black),
+                          )))),
                   const SizedBox(width: 50.0),
 
                   // Custom Time Input (Hours and Minutes)
@@ -160,25 +158,23 @@ class _Ipad12State extends State<Ipad12> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                 
                   TextButton(
                       onPressed: () {
-                           Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => Ipad11()));
-                    
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) => Ipad11()));
                       },
                       child: Container(
-                         height: 90,
-                    width: 200,
-                    decoration: BoxDecoration(
-                        color: Colors.yellow,
-                        borderRadius: BorderRadius.circular(10.0)),
-                        child: Center(child: const Text("Back",style: TextStyle(color: Colors.black),)))),
+                          height: 90,
+                          width: 200,
+                          decoration: BoxDecoration(
+                              color: Colors.yellow,
+                              borderRadius: BorderRadius.circular(10.0)),
+                          child: Center(
+                              child: const Text(
+                            "Back",
+                            style: TextStyle(color: Colors.black),
+                          )))),
                   const SizedBox(height: 20.0),
-
-                
                   TextButton(
                       onPressed: () {
                         // Get the entered time from the input fields
@@ -188,16 +184,22 @@ class _Ipad12State extends State<Ipad12> {
                         _setTimeAndNavigate(controller, enteredTime);
                       },
                       child: Container(
-                         height: 90,
-                    width: 200,
-                    decoration: BoxDecoration(
-                        color: Colors.yellow,
-                        borderRadius: BorderRadius.circular(10.0)),
-                        child: Center(child: const Text("Next",style: TextStyle(color: Colors.black),))))
+                          height: 90,
+                          width: 200,
+                          decoration: BoxDecoration(
+                              color: Colors.yellow,
+                              borderRadius: BorderRadius.circular(10.0)),
+                          child: Center(
+                              child: const Text(
+                            "Next",
+                            style: TextStyle(color: Colors.black),
+                          ))))
                 ],
               ),
               const SizedBox(height: 30.0),
-              Footer(isShowSettings: true)
+              const Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Footer(isShowSettings: true))
             ],
           );
         },

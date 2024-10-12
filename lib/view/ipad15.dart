@@ -15,12 +15,14 @@ class Ipad15 extends StatefulWidget {
 }
 
 class _Ipad15State extends State<Ipad15> {
-    void initState() {
-    super.initState();
+    @override
+      void initState() {
+   
     // Fetch VLine data when the widget is initialized
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<MetroLineController>(context, listen: false).getMetrolines();
     });
+     super.initState();
   }
   @override
   Widget build(BuildContext context) {
@@ -87,7 +89,7 @@ class _Ipad15State extends State<Ipad15> {
                         // Display the list of customers
                         return GridView.builder(
                           gridDelegate:  const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 4, // 3 items per row
+                            crossAxisCount: 3, // 3 items per row
                             crossAxisSpacing: 5.0, // Space between columns
                             mainAxisSpacing: 5.0, // Space between rows
                             childAspectRatio: 3, // Adjust the ratio to fit your design

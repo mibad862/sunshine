@@ -6,7 +6,9 @@ import 'package:sunshine_app/components/visibility_wrapper.dart';
 import 'package:sunshine_app/controller/theme_controller.dart';
 import 'package:sunshine_app/services/multi_providers.dart';
 import 'package:sunshine_app/view/home_screen.dart';
-
+import 'package:sunshine_app/view/ipad11.dart';
+import 'package:sunshine_app/view/ipad14.dart';
+import 'package:sunshine_app/view/ipad15.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -78,7 +80,6 @@ class MyApp extends StatelessWidget {
           );
         },
       ),
-
     );
   }
 }
