@@ -4,29 +4,24 @@ import 'package:http/http.dart' as http;
 import 'package:nb_utils/nb_utils.dart';
 import 'package:sunshine_app/config/app_config.dart';
 import '../models/ipad16_model.dart';
+import 'package:logger/logger.dart';
 
-class Ipad16Controller extends ChangeNotifier {
+class Ipad16TwoController extends ChangeNotifier {
+  String lineId;
 
-  Ipad16Controller(){
+  Ipad16TwoController({required String lineID}) : lineId = lineID {
     fetchStations();
-    selectedAlphabet = 'A';
   }
 
   List<Station> stations = [];
-  List<Station> filteredStations = []; // List to hold filtered stations
   bool isLoading = false;
   String errorMessage = '';
-  String selectedAlphabet = '';
 
-  void changeColor({required String selectedValue}) {
-    selectedAlphabet = selectedValue;
-    filterStations(); // Filter stations when a new alphabet is selected
-    notifyListeners();
-  }
+  final logger = Logger();
 
   // Function to fetch station data from the API
   Future<void> fetchStations() async {
-    final String apiUrl = "https://api.g00r.com.au/API/getStations";
+    const String apiUrl = "https://api.g00r.com.au/API/getStations";
 
     try {
       isLoading = true;
@@ -37,10 +32,13 @@ class Ipad16Controller extends ChangeNotifier {
 
       if (token == null) {
         errorMessage = 'Authentication token not found';
-        isLoading = false;
-        notifyListeners();
-        return;
+        logger.e('Authentication token not found'); // Log error
+        return; // No need to call notifyListeners() here, as isLoading will be set to false later
       }
+
+      logger.d("Line ID: $lineId");
+
+      print("Line ID: $lineId");
 
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -50,8 +48,13 @@ class Ipad16Controller extends ChangeNotifier {
         },
         body: jsonEncode({
           "serverKey": AppConfig.serverKey,
+          "lineId": lineId, // Use the lineId from the controller
         }),
       );
+
+      print("Response $response.body");
+
+      logger.i("Response: ${response.body}"); // Log the response
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -59,33 +62,21 @@ class Ipad16Controller extends ChangeNotifier {
           stations = (data['stations'] as List)
               .map((station) => Station.fromJson(station))
               .toList();
-          filterStations(); // Initial filter based on default value
           errorMessage = '';
         } else {
           errorMessage = data['message'] ?? 'Failed to fetch stations';
+          logger.w('Failed to fetch stations: $errorMessage'); // Log warning
         }
       } else {
         errorMessage = 'Failed to fetch stations: ${response.statusCode}';
+        logger.e('API error: ${response.statusCode}'); // Log error
       }
     } catch (e) {
       errorMessage = 'An error occurred: $e';
+      logger.e('An exception occurred: $e'); // Log error
     } finally {
       isLoading = false;
       notifyListeners();
     }
   }
-
-  // Method to filter stations based on the selected alphabet
-  void filterStations() {
-    if (selectedAlphabet.isEmpty) {
-      filteredStations = stations;
-    } else {
-      filteredStations = stations
-          .where((station) => station.name.startsWith(selectedAlphabet))
-          .toList();
-    }
-    notifyListeners();
-  }
 }
-
-

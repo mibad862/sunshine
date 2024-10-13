@@ -5,6 +5,7 @@ import 'package:sunshine_app/components/header.dart';
 import 'package:sunshine_app/components/visibility_wrapper.dart';
 import 'package:sunshine_app/controller/ipad15_controller.dart';
 import 'package:sunshine_app/view/ipad12.dart';
+import 'package:sunshine_app/view/ipad16-two.dart';
 import 'package:sunshine_app/view/ipad16.dart';
 
 class Ipad15 extends StatefulWidget {
@@ -104,7 +105,7 @@ class _Ipad15State extends State<Ipad15> {
                                    Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => Ipad16()));
+                                  builder: (context) => Ipad16Two(lineID: controller.selectedNameId)));
                               },
                               child: Container(
                                 margin: const EdgeInsets.symmetric(

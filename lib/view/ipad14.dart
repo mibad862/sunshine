@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:sunshine_app/components/footer.dart';
 import 'package:sunshine_app/components/visibility_wrapper.dart';
 import 'package:sunshine_app/controller/ipad14_controller.dart';
+import 'package:sunshine_app/view/ipad16-two.dart';
 import 'package:sunshine_app/view/ipad16.dart';
 
 class Ipad14 extends StatefulWidget {
@@ -15,21 +16,17 @@ class Ipad14 extends StatefulWidget {
 class _Ipad14State extends State<Ipad14> {
   @override
   void initState() {
-    
-  
     // Fetch VLine data when the widget is initialized
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<VLineController>(context, listen: false).getVlines();
-      
     });
-      super.initState();
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return VisibilityWrapper(
       bodyScreen: Scaffold(
-       
         body: Consumer<VLineController>(
           builder: (context, vLineController, child) {
             // Display error messages using SnackBar if there's an error
@@ -46,7 +43,8 @@ class _Ipad14State extends State<Ipad14> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text('V/Line Selection',
-                style: TextStyle(fontSize: 8.0, fontWeight: FontWeight.bold)),
+                    style:
+                        TextStyle(fontSize: 8.0, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 18.0),
                 const Text(
                   "Emergency Call Out",
@@ -96,37 +94,39 @@ class _Ipad14State extends State<Ipad14> {
                           itemBuilder: (context, index) {
                             final customer =
                                 vLineController.vLineResponse!.customers[index];
-                            return
-                                GestureDetector(
-                                  onTap: () {
-                                    vLineController.setSelectedNameId(customer.id); // Handle customer selection 
-                                    
-                                      Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => Ipad16()));
+                            return GestureDetector(
+                              onTap: () {
+                                vLineController.setSelectedNameId(
+                                  customer.id,
+                                ); // Handle customer selection
 
-                                  },
-                                  child: Container(
-                                    margin: const EdgeInsets.symmetric(
-                                        vertical: 8.0, horizontal: 20.0),
-                                    padding: const EdgeInsets.all(16.0),
-                                    decoration: BoxDecoration(
-                                      color: Colors.yellow.withOpacity(0.5),
-                                      borderRadius: BorderRadius.circular(20.0),
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        customer.name,
-                                        style: const TextStyle(
-                                          fontSize: 18.0,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => Ipad16Two(
+                                              lineID: vLineController
+                                                  .selectedNameId,
+                                            )));
+                              },
+                              child: Container(
+                                margin: const EdgeInsets.symmetric(
+                                    vertical: 8.0, horizontal: 20.0),
+                                padding: const EdgeInsets.all(16.0),
+                                decoration: BoxDecoration(
+                                  color: Colors.yellow.withOpacity(0.5),
+                                  borderRadius: BorderRadius.circular(20.0),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    customer.name,
+                                    style: const TextStyle(
+                                      fontSize: 18.0,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                );
-                             
+                                ),
+                              ),
+                            );
                           },
                         );
                       }
