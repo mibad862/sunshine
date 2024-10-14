@@ -3,13 +3,14 @@ import 'package:provider/provider.dart';
 import 'package:sunshine_app/components/footer.dart';
 import 'package:sunshine_app/components/header.dart';
 import 'package:sunshine_app/components/visibility_wrapper.dart';
+import 'package:sunshine_app/controller/ipad16_three_controller.dart';
 import 'package:sunshine_app/view/ipad16-three.dart';
 import 'package:sunshine_app/view/ipad19.dart';
 import 'package:sunshine_app/view/ipad20.dart';
 import 'package:sunshine_app/view/ipad21.dart';
 import '../controller/ipad17_controller.dart';
 
-class Ipad17 extends StatelessWidget {
+class Ipad17 extends StatefulWidget {
   final String? startingStation;
   final String? stationID;
   final String? lineID;
@@ -22,10 +23,23 @@ class Ipad17 extends StatelessWidget {
   });
 
   @override
+  State<Ipad17> createState() => _Ipad17State();
+}
+
+class _Ipad17State extends State<Ipad17> {
+  String destinationStaionName = "";
+  String destinationStaionId = "";
+
+  List<Map<String, dynamic>> stoppingPattern = [];
+
+  int paxCounter = 0;
+
+  @override
   Widget build(BuildContext context) {
     // Use the controller to fetch and manage direction status
     return ChangeNotifierProvider(
-      create: (_) => Ipad17Controller()..fetchDirectionStatus(stationID!),
+      create: (_) =>
+          Ipad17Controller()..fetchDirectionStatus(widget.stationID!),
       child: Consumer<Ipad17Controller>(
         builder: (context, controller, child) {
           return VisibilityWrapper(
@@ -87,7 +101,7 @@ class Ipad17 extends StatelessWidget {
                                         borderRadius:
                                             BorderRadius.circular(10.0)),
                                     alignment: Alignment.center,
-                                    child: Text(startingStation ?? ""),
+                                    child: Text(widget.startingStation ?? ""),
                                   ),
                                   Container(
                                     height: 60.0,
@@ -124,10 +138,6 @@ class Ipad17 extends StatelessWidget {
                                   Container(
                                     height: 60.0,
                                     width: 150.0,
-                                    //  decoration: BoxDecoration(
-                                    //      //  color: Colors.yellow,
-                                    //       // borderRadius: BorderRadius.circular(10.0)
-                                    //  ),
                                     alignment: Alignment.center,
                                     //  child: Text("ARRIVE NOW"),
                                   ),
@@ -197,12 +207,41 @@ class Ipad17 extends StatelessWidget {
                           ),
                         ),
                         SizedBox(
-                          height: 250.0,
+                          height: 250.0, // Adjust as per your widget height
                           width: MediaQuery.sizeOf(context).width * .33,
-                          child: CustomPaint(
-                            painter: OdometerSmallPainter(),
+                          child: GestureDetector(
+                            onTapUp: (details) {
+                              final localPosition = details.localPosition.dy;
+                              final totalHeight =
+                                  250.0; // Full height of the widget
+                              final triangleHeight = totalHeight / 4;
+                              final containerHeight = totalHeight / 4;
+                              final spacing = 10.0;
+                              final topTriangleArea = triangleHeight;
+                              final bottomTriangleArea = triangleHeight +
+                                  containerHeight +
+                                  2 * spacing;
+
+                              // Check if the tap is in the upper triangle
+                              if (localPosition < topTriangleArea) {
+                                setState(() {
+                                  paxCounter++; // Increment when the upper triangle is tapped
+                                });
+                              }
+                              // Check if the tap is in the lower triangle
+                              else if (localPosition > bottomTriangleArea) {
+                                setState(() {
+                                  paxCounter--; // Decrement when the lower triangle is tapped
+                                });
+                              }
+                            },
+                            child: CustomPaint(
+                              painter: OdometerSmallPainter(
+                                  paxCounter:
+                                      paxCounter), // Pass paxCounter to the painter
+                            ),
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),
@@ -228,56 +267,6 @@ class Ipad17 extends StatelessWidget {
                                         fontWeight: FontWeight.bold,
                                         fontSize: 20.0),
                                   ),
-
-                                  // GestureDetector(
-                                  //   onTap: () async {
-                                  //     if (controller.canGoUpValue && controller.canGoDownValue) {
-                                  //       ScaffoldMessenger.of(context).showSnackBar(
-                                  //         const SnackBar(
-                                  //           content: Text('Please select only one direction.'),
-                                  //           duration: Duration(seconds: 2),
-                                  //         ),
-                                  //       );
-                                  //     } else if (controller.canGoUpValue || controller.canGoDownValue) {
-                                  //       String direction = controller.canGoUpValue ? "Up" : "Down";
-                                  //       print("Direction : $direction");
-                                  //
-                                  //       // Use mounted to check if the widget is still in the widget tree
-                                  //       if (context.mounted) {
-                                  //         final result = await Navigator.push(
-                                  //           context,
-                                  //           MaterialPageRoute(
-                                  //             builder: (context) => Ipad16Three(
-                                  //               direction: direction,
-                                  //               startingStationID: stationID ?? "",
-                                  //             ),
-                                  //           ),
-                                  //         );
-                                  //
-                                  //         if (result != null) {
-                                  //           print("Returned value: $result");
-                                  //         }
-                                  //       }
-                                  //     } else {
-                                  //       ScaffoldMessenger.of(context).showSnackBar(
-                                  //         const SnackBar(
-                                  //           content: Text('Please select a direction.'),
-                                  //           duration: Duration(seconds: 2),
-                                  //         ),
-                                  //       );
-                                  //     }
-                                  //   },
-                                  //   child: Container(
-                                  //     height: 60.0,
-                                  //     width: 150.0,
-                                  //     decoration: BoxDecoration(
-                                  //       color: Colors.white,
-                                  //       borderRadius: BorderRadius.circular(10.0),
-                                  //     ),
-                                  //     alignment: Alignment.center,
-                                  //     child: const Text("Choose"),
-                                  //   ),
-                                  // ),
                                   GestureDetector(
                                     onTap: () async {
                                       // Check if both UP and DOWN are selected
@@ -307,7 +296,7 @@ class Ipad17 extends StatelessWidget {
                                             builder: (context) => Ipad16Three(
                                               direction: direction,
                                               startingStationID:
-                                                  stationID ?? "",
+                                                  widget.stationID ?? "",
                                             ),
                                           ),
                                         );
@@ -315,6 +304,13 @@ class Ipad17 extends StatelessWidget {
                                         // Process the result received from Ipad16Three
                                         if (result != null) {
                                           // Do something with the returned value
+                                          setState(() {
+                                            destinationStaionName = result[0];
+                                            destinationStaionId = result[1];
+                                          });
+                                          print(
+                                              "Dest Name $destinationStaionName");
+                                          print("Dest Id $destinationStaionId");
                                           ScaffoldMessenger.of(context)
                                             ..removeCurrentSnackBar()
                                             ..showSnackBar(SnackBar(
@@ -330,24 +326,6 @@ class Ipad17 extends StatelessWidget {
                                           ),
                                         );
                                       }
-                                      //   Navigator.push(
-                                      //     context,
-                                      //     MaterialPageRoute(
-                                      //       builder: (context) => Ipad16Three(
-                                      //         direction: direction,
-                                      //         startingStationID: stationID ?? "",
-                                      //       ),
-                                      //     ),
-                                      //   );
-                                      // } else {
-                                      //   // If none are selected, show a warning
-                                      //   ScaffoldMessenger.of(context).showSnackBar(
-                                      //     const SnackBar(
-                                      //       content: Text('Please select a direction.'),
-                                      //       duration: Duration(seconds: 2),
-                                      //     ),
-                                      //   );
-                                      // }
                                     },
                                     child: Container(
                                       height: 60.0,
@@ -357,39 +335,17 @@ class Ipad17 extends StatelessWidget {
                                           borderRadius:
                                               BorderRadius.circular(10.0)),
                                       alignment: Alignment.center,
-                                      child: const Text("Choose"),
+                                      child: Text(
+                                        destinationStaionName.isNotEmpty
+                                            ? destinationStaionName
+                                            : "Choose",
+                                      ),
                                     ),
                                   ),
-
-                                  // GestureDetector(
-                                  //   onTap: () {
-                                  //     Navigator.push(
-                                  //         context,
-                                  //         MaterialPageRoute(
-                                  //             builder: (context) => Ipad16Three(
-                                  //                   direction: "UP",
-                                  //                   startingStationID:
-                                  //                       stationID ?? "",
-                                  //                 )));
-                                  //   },
-                                  //   child: Container(
-                                  //     height: 60.0,
-                                  //     width: 150.0,
-                                  //     decoration: BoxDecoration(
-                                  //         color: Colors.white,
-                                  //         borderRadius:
-                                  //             BorderRadius.circular(10.0)),
-                                  //     alignment: Alignment.center,
-                                  //     child: const Text("Choose"),
-                                  //   ),
-                                  // ),
                                   Container(
                                     height: 60.0,
                                     width: 150.0,
-                                    //  decoration: BoxDecoration(
-                                    //      //  color: Colors.yellow,
-                                    //       // borderRadius: BorderRadius.circular(10.0)
-                                    //  ),
+
                                     alignment: Alignment.center,
                                     //  child: Text("ARRIVE NOW"),
                                   ),
@@ -409,12 +365,48 @@ class Ipad17 extends StatelessWidget {
                                         fontSize: 20.0),
                                   ),
                                   GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) => Ipad20()));
+                                    onTap: () async {
+                                      // Navigate to Ipad20 and wait for the result
+                                      final result = await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => Ipad20(
+                                            startingAtStation:
+                                                widget.startingStation ?? "",
+                                            startingAtStationId:
+                                                widget.stationID ?? "",
+                                            destinationStation:
+                                                destinationStaionName,
+                                            destinationStationId:
+                                                destinationStaionId,
+                                          ),
+                                        ),
+                                      );
+
+                                      // Check if we received any data back
+                                      if (result != null &&
+                                          result
+                                              is List<Map<String, dynamic>>) {
+                                        stoppingPattern =
+                                            result; // Update the local state with the returned stations
+                                        print("Stopping Pattern");
+                                        print(stoppingPattern);
+                                      }
                                     },
+                                    // onTap: () {
+                                    //
+                                    //
+                                    //   Navigator.push(
+                                    //       context,
+                                    //       MaterialPageRoute(
+                                    //           builder: (context) => Ipad20(
+                                    //                 startingAtStation:
+                                    //                     startingStation ?? "",
+                                    //                     startingAtStationId: stationID ?? "",
+                                    //                     destinationStation: destinationStaionName,
+                                    //                     destinationStationId: destinationStaionId,
+                                    //               )));
+                                    // },
                                     child: Container(
                                       height: 60.0,
                                       width: 150.0,
@@ -528,17 +520,21 @@ class Ipad17 extends StatelessWidget {
 }
 
 class OdometerSmallPainter extends CustomPainter {
+  final int paxCounter;
+
+  OdometerSmallPainter({required this.paxCounter});
+
   @override
   void paint(Canvas canvas, Size size) {
-    // Paint object for red triangles
+    // Paint object for blue triangles
     final trianglePaint = Paint()
-      ..color = Colors.blue.withOpacity(0.7) // Red for triangles
+      ..color = Colors.blue.withOpacity(0.7) // Blue for triangles
       ..strokeWidth = 2
       ..style = PaintingStyle.fill;
 
-    // Paint object for yellow boxes
+    // Paint object for red boxes
     final boxPaint = Paint()
-      ..color = Colors.red // Yellow for boxes
+      ..color = Colors.red // Red for boxes
       ..strokeWidth = 2
       ..style = PaintingStyle.fill;
 
@@ -558,8 +554,7 @@ class OdometerSmallPainter extends CustomPainter {
       path.lineTo(startX, triangleHeight); // Bottom left
       path.lineTo(startX + adjustedWidth, triangleHeight); // Bottom right
       path.close();
-      canvas.drawPath(
-          path, trianglePaint); // Use trianglePaint for red triangles
+      canvas.drawPath(path, trianglePaint); // Draw the upper triangle
     }
 
     // Drawing containers (with spacing)
@@ -571,15 +566,13 @@ class OdometerSmallPainter extends CustomPainter {
         adjustedWidth,
         containerHeight,
       );
-      canvas.drawRect(rect, boxPaint); // Use boxPaint for yellow boxes
+      canvas.drawRect(rect, boxPaint); // Draw the container
     }
 
     // Drawing bottom triangles (with spacing)
-    // Adding similar spacing below the containers like the top triangles
     for (int i = 0; i < 1; i++) {
       final path = Path();
       final startX = i * (adjustedWidth + spacing);
-      // The bottom triangles should start after the containers, with added spacing
       final bottomYStart = triangleHeight + spacing + containerHeight + spacing;
 
       path.moveTo(startX + adjustedWidth / 2,
@@ -588,13 +581,32 @@ class OdometerSmallPainter extends CustomPainter {
       path.lineTo(
           startX + adjustedWidth, bottomYStart); // Top right of the triangle
       path.close();
-      canvas.drawPath(
-          path, trianglePaint); // Use trianglePaint for red triangles
+      canvas.drawPath(path, trianglePaint); // Draw the lower triangle
     }
+
+    // Draw the current paxCounter value in the center square
+    final textPainter = TextPainter(
+      text: TextSpan(
+        text: paxCounter.toString(),
+        style: TextStyle(
+            color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+      ),
+      textDirection: TextDirection.ltr,
+    );
+
+    textPainter.layout();
+    final startX = (size.width - textPainter.width) / 2;
+    final startY =
+        (triangleHeight + spacing + containerHeight - textPainter.height) / 2 +
+            triangleHeight +
+            spacing;
+
+    textPainter.paint(
+        canvas, Offset(startX, startY)); // Draw paxCounter in the box
   }
 
   @override
   bool shouldRepaint(CustomPainter oldDelegate) {
-    return false;
+    return true; // Allow repainting when paxCounter changes
   }
 }

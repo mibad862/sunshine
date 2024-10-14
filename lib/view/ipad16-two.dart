@@ -58,23 +58,36 @@ class Ipad16Two extends StatelessWidget {
                   } else {
                     return Wrap(
                       children: controller.stations.map((station) {
-                        return Container(
-                          padding: const EdgeInsets.all(5),
-                          alignment: Alignment.center,
-                          margin: const EdgeInsets.symmetric(
-                              horizontal: 5.0, vertical: 10.0),
-                          height: 55.0,
-                          width: 160.0,
-                          decoration: BoxDecoration(
-                            color: Colors.green,
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          child: Text(
-                            station.name,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 17.0,
+                        return InkWell(
+                          onTap: (){
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => Ipad17(
+                                    startingStation: station.name,
+                                    lineID: station.lineId,
+                                    stationID: station.id,
+                                  ),
+                                ));
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(5),
+                            alignment: Alignment.center,
+                            margin: const EdgeInsets.symmetric(
+                                horizontal: 5.0, vertical: 10.0),
+                            height: 48.0,
+                            width: 140.0,
+                            decoration: BoxDecoration(
+                              color: Colors.green,
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            child: Text(
+                              station.name,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15.0,
+                              ),
                             ),
                           ),
                         );
@@ -90,14 +103,19 @@ class Ipad16Two extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Container(
-                    decoration: BoxDecoration(
-                        color: Colors.yellow,
-                        borderRadius: BorderRadius.circular(10.0)),
-                    width: 200.0,
-                    height: 60.0,
-                    alignment: Alignment.center,
-                    child: const Text("BACK"),
+                  GestureDetector(
+                    onTap: (){
+                      Navigator.pop(context);
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                          color: Colors.yellow,
+                          borderRadius: BorderRadius.circular(10.0)),
+                      width: 200.0,
+                      height: 60.0,
+                      alignment: Alignment.center,
+                      child: const Text("BACK"),
+                    ),
                   ),
                   Container(
                     decoration: BoxDecoration(

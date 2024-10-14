@@ -35,7 +35,7 @@ class Ipad17Controller extends ChangeNotifier {
     const String apiUrl = "https://api.g00r.com.au/API/getDirectionStatus";
     final body = {
       "serverKey": AppConfig.serverKey,
-      "startingStationId": 1,
+      "startingStationId": startingStationId,
     };
 
     print("Station ID: $startingStationId");
