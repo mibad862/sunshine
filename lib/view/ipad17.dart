@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:nb_utils/nb_utils.dart';
 import 'package:provider/provider.dart';
 import 'package:sunshine_app/components/footer.dart';
 import 'package:sunshine_app/components/header.dart';
 import 'package:sunshine_app/components/visibility_wrapper.dart';
-import 'package:sunshine_app/controller/ipad16_three_controller.dart';
 import 'package:sunshine_app/view/ipad16-three.dart';
 import 'package:sunshine_app/view/ipad19.dart';
 import 'package:sunshine_app/view/ipad20.dart';
-import 'package:sunshine_app/view/ipad21.dart';
+
 import '../controller/ipad17_controller.dart';
 
 class Ipad17 extends StatefulWidget {
@@ -33,6 +33,23 @@ class _Ipad17State extends State<Ipad17> {
   List<Map<String, dynamic>> stoppingPattern = [];
 
   int paxCounter = 0;
+
+  void incrementPaxCount() {
+    setState(() {
+      paxCounter++; // Increment the count
+    });
+  }
+
+  // Method to decrement pax count
+  void decrementPaxCount() {
+    setState(() {
+      if (paxCounter > 0) {
+        paxCounter--; // Decrement the count, ensuring it doesn't go below 0
+      } else {
+        Fluttertoast.showToast(msg: "Pax Count Cannot be less than 0");
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -103,15 +120,25 @@ class _Ipad17State extends State<Ipad17> {
                                     alignment: Alignment.center,
                                     child: Text(widget.startingStation ?? ""),
                                   ),
-                                  Container(
-                                    height: 60.0,
-                                    width: 150.0,
-                                    decoration: BoxDecoration(
-                                        color: Colors.yellow,
+                                  GestureDetector(
+                                    onTap: () {
+                                      controller
+                                          .onArriveNowPressed(); // Call the method from the controller
+                                      print(
+                                          "Arrive Now pressed at: ${controller.arrivedTime}"); // Debug print
+                                    },
+                                    child: Container(
+                                      height: 60.0,
+                                      width: 150.0,
+                                      decoration: BoxDecoration(
+                                        color: controller.arriveNowButtonColor,
+                                        // Use color from controller
                                         borderRadius:
-                                            BorderRadius.circular(10.0)),
-                                    alignment: Alignment.center,
-                                    child: Text("ARRIVE NOW"),
+                                            BorderRadius.circular(10.0),
+                                      ),
+                                      alignment: Alignment.center,
+                                      child: const Text("ARRIVE NOW"),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -126,14 +153,21 @@ class _Ipad17State extends State<Ipad17> {
                                         fontSize: 20.0),
                                   ),
                                   Container(
-                                    height: 60.0,
-                                    width: 150.0,
                                     decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius:
-                                            BorderRadius.circular(10.0)),
-                                    alignment: Alignment.center,
-                                    child: const Text(""),
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: Colors.white,
+                                    ),
+                                    width: 150,
+                                    height: 55,
+                                    child: TextFormField(
+                                      controller:
+                                          controller.supervisorController,
+                                      decoration: InputDecoration(
+                                        border: OutlineInputBorder(
+                                          borderSide: BorderSide.none,
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                   Container(
                                     height: 60.0,
@@ -153,47 +187,61 @@ class _Ipad17State extends State<Ipad17> {
                                         fontWeight: FontWeight.bold,
                                         fontSize: 20.0),
                                   ),
+
                                   GestureDetector(
-                                    onTap: controller.canGoUpAccessible
-                                        ? () {
-                                            controller.toggleCanGoUp();
-                                            print("UP");
-                                          }
-                                        : () {
-                                            print("UP button disabled");
-                                          },
+                                    onTap: controller.canGoUpValue
+                                        ? controller
+                                            .toggleUpButton // Toggle only if accessible
+                                        : null,
                                     child: Container(
-                                      height: 60.0,
-                                      width: 150.0,
+                                      height: 60,
+                                      width: 150,
                                       decoration: BoxDecoration(
                                         color: controller.canGoUpValue
-                                            ? Colors.yellow
-                                            : Colors.black45,
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
+                                            ? controller.upButtonColor
+                                            : Colors.black26,
+                                        // Dynamic color
+                                        borderRadius: BorderRadius.circular(10),
                                       ),
                                       alignment: Alignment.center,
-                                      child: const Text("UP"),
+                                      child: Text("UP"), // Text based on value
                                     ),
                                   ),
+                                  // GestureDetector(
+                                  //   onTap: controller.canGoUpAccessible
+                                  //       ? () {
+                                  //           controller.toggleCanGoUp();
+                                  //           print("UP");
+                                  //         }
+                                  //       : () {
+                                  //           print("UP button disabled");
+                                  //         },
+                                  //   child: Container(
+                                  //     height: 60.0,
+                                  //     width: 150.0,
+                                  //     decoration: BoxDecoration(
+                                  //       color: controller.canGoUpValue
+                                  //           ? Colors.yellow
+                                  //           : Colors.black45,
+                                  //       borderRadius:
+                                  //           BorderRadius.circular(10.0),
+                                  //     ),
+                                  //     alignment: Alignment.center,
+                                  //     child: const Text("UP"),
+                                  //   ),
+                                  // ),
                                   GestureDetector(
-                                    onTap: controller.canGoDownAccessible
-                                        ? () {
-                                            controller.toggleCanGoDown();
-                                            print("DOWN");
-                                          }
-                                        : () {
-                                            print("UP button disabled");
-                                            print(controller.canGoUpAccessible);
-                                            print(controller.canGoUpValue);
-                                          },
+                                    onTap: controller.canGoDownValue
+                                        ? controller
+                                            .toggleDownButton // Toggle only if accessible
+                                        : null,
                                     child: Container(
                                       height: 60.0,
                                       width: 150.0,
                                       decoration: BoxDecoration(
                                         color: controller.canGoDownValue
-                                            ? Colors.green
-                                            : Colors.black45,
+                                            ? controller.downButtonColor
+                                            : Colors.black26,
                                         borderRadius:
                                             BorderRadius.circular(10.0),
                                       ),
@@ -206,42 +254,103 @@ class _Ipad17State extends State<Ipad17> {
                             ],
                           ),
                         ),
-                        SizedBox(
-                          height: 250.0, // Adjust as per your widget height
-                          width: MediaQuery.sizeOf(context).width * .33,
-                          child: GestureDetector(
-                            onTapUp: (details) {
-                              final localPosition = details.localPosition.dy;
-                              final totalHeight =
-                                  250.0; // Full height of the widget
-                              final triangleHeight = totalHeight / 4;
-                              final containerHeight = totalHeight / 4;
-                              final spacing = 10.0;
-                              final topTriangleArea = triangleHeight;
-                              final bottomTriangleArea = triangleHeight +
-                                  containerHeight +
-                                  2 * spacing;
-
-                              // Check if the tap is in the upper triangle
-                              if (localPosition < topTriangleArea) {
-                                setState(() {
-                                  paxCounter++; // Increment when the upper triangle is tapped
-                                });
-                              }
-                              // Check if the tap is in the lower triangle
-                              else if (localPosition > bottomTriangleArea) {
-                                setState(() {
-                                  paxCounter--; // Decrement when the lower triangle is tapped
-                                });
-                              }
-                            },
-                            child: CustomPaint(
-                              painter: OdometerSmallPainter(
-                                  paxCounter:
-                                      paxCounter), // Pass paxCounter to the painter
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              "Pax Count",
+                              style: TextStyle(fontSize: 20),
                             ),
-                          ),
+                            SizedBox(width: 10),
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                GestureDetector(
+                                  onTap: incrementPaxCount,
+                                  child: Container(
+                                    height: 35,
+                                    width: 60,
+                                    decoration: BoxDecoration(
+                                      color: Colors.red,
+                                      borderRadius: BorderRadius.only(
+                                          topRight: Radius.circular(10),
+                                          topLeft: Radius.circular(10)),
+                                    ),
+                                    child: Icon(
+                                      Icons.plus_one,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(height: 10),
+                                Container(
+                                  alignment: Alignment.center,
+                                  height: 35,
+                                  width: 55,
+                                  decoration: BoxDecoration(
+                                    color: Colors.green,
+                                  ),
+                                  child: Text(paxCounter.toString()),
+                                ),
+                                SizedBox(height: 10),
+                                GestureDetector(
+                                  onTap: decrementPaxCount,
+                                  child: Container(
+                                    height: 35,
+                                    width: 60,
+                                    decoration: BoxDecoration(
+                                      color: Colors.red,
+                                      borderRadius: BorderRadius.only(
+                                          bottomRight: Radius.circular(10),
+                                          bottomLeft: Radius.circular(10)),
+                                    ),
+                                    child: Icon(
+                                      Icons.exposure_minus_1,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
+                        // SizedBox(
+                        //   height: 250.0, // Adjust as per your widget height
+                        //   width: MediaQuery.sizeOf(context).width * .33,
+                        //   child: GestureDetector(
+                        //     onTapUp: (details) {
+                        //       final localPosition = details.localPosition.dy;
+                        //       final totalHeight =
+                        //           250.0; // Full height of the widget
+                        //       final triangleHeight = totalHeight / 4;
+                        //       final containerHeight = totalHeight / 4;
+                        //       final spacing = 10.0;
+                        //       final topTriangleArea = triangleHeight;
+                        //       final bottomTriangleArea = triangleHeight +
+                        //           containerHeight +
+                        //           2 * spacing;
+                        //
+                        //       // Check if the tap is in the upper triangle
+                        //       if (localPosition < topTriangleArea) {
+                        //         setState(() {
+                        //           paxCounter++; // Increment when the upper triangle is tapped
+                        //         });
+                        //       }
+                        //       // Check if the tap is in the lower triangle
+                        //       else if (localPosition > bottomTriangleArea) {
+                        //         setState(() {
+                        //           paxCounter--; // Decrement when the lower triangle is tapped
+                        //         });
+                        //       }
+                        //     },
+                        //     child: CustomPaint(
+                        //       painter: OdometerSmallPainter(
+                        //           paxCounter:
+                        //               paxCounter), // Pass paxCounter to the painter
+                        //     ),
+                        //   ),
+                        // ),
                       ],
                     ),
                   ),
@@ -267,12 +376,13 @@ class _Ipad17State extends State<Ipad17> {
                                         fontWeight: FontWeight.bold,
                                         fontSize: 20.0),
                                   ),
+
                                   GestureDetector(
                                     onTap: () async {
                                       // Check if both UP and DOWN are selected
-                                      if (controller.canGoUpValue &&
-                                          controller.canGoDownValue) {
-                                        // Show a message if both are true
+                                      if (controller.upButtonValue != null &&
+                                          controller.downButtonValue != null) {
+                                        // Show a message if both are selected (though only one should be selected at a time)
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(
                                           const SnackBar(
@@ -281,14 +391,28 @@ class _Ipad17State extends State<Ipad17> {
                                             duration: Duration(seconds: 2),
                                           ),
                                         );
-                                      } else if (controller.canGoUpValue ||
-                                          controller.canGoDownValue) {
-                                        // If only one is true, navigate to the next screen
+                                      }
+                                      // Check if neither direction is selected
+                                      else if (controller.upButtonValue ==
+                                              null &&
+                                          controller.downButtonValue == null) {
+                                        // Show a message if neither is selected
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                                'Please select a direction.'),
+                                            duration: Duration(seconds: 2),
+                                          ),
+                                        );
+                                      }
+                                      // If only one direction is selected, navigate to the next screen
+                                      else {
                                         String direction =
-                                            controller.canGoUpValue
+                                            controller.upButtonValue == "UP"
                                                 ? "Up"
                                                 : "Down";
-                                        print("Direction : $direction");
+                                        print("Direction: $direction");
 
                                         final result = await Navigator.push(
                                           context,
@@ -303,37 +427,32 @@ class _Ipad17State extends State<Ipad17> {
 
                                         // Process the result received from Ipad16Three
                                         if (result != null) {
-                                          // Do something with the returned value
                                           setState(() {
                                             destinationStaionName = result[0];
+                                            controller.destinationName =
+                                                result[0];
                                             destinationStaionId = result[1];
+                                            controller.destinationId =
+                                                result[1];
                                           });
-                                          print(
-                                              "Dest Name $destinationStaionName");
-                                          print("Dest Id $destinationStaionId");
+
+                                          // Display result in a snackbar
                                           ScaffoldMessenger.of(context)
                                             ..removeCurrentSnackBar()
                                             ..showSnackBar(SnackBar(
-                                                content: Text("$result")));
+                                                content: Text(
+                                                    "Destination: $destinationStaionName (ID: $destinationStaionId)")));
                                         }
-                                      } else {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                            content: Text(
-                                                'Please select a direction.'),
-                                            duration: Duration(seconds: 2),
-                                          ),
-                                        );
                                       }
                                     },
                                     child: Container(
                                       height: 60.0,
                                       width: 150.0,
                                       decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(10.0)),
+                                        color: Colors.white,
+                                        borderRadius:
+                                            BorderRadius.circular(10.0),
+                                      ),
                                       alignment: Alignment.center,
                                       child: Text(
                                         destinationStaionName.isNotEmpty
@@ -342,6 +461,86 @@ class _Ipad17State extends State<Ipad17> {
                                       ),
                                     ),
                                   ),
+
+                                  // GestureDetector(
+                                  //   onTap: () async {
+                                  //     // Check if both UP and DOWN are selected
+                                  //     if (controller.canGoUpValue &&
+                                  //         controller.canGoDownValue) {
+                                  //       // Show a message if both are true
+                                  //       ScaffoldMessenger.of(context)
+                                  //           .showSnackBar(
+                                  //         const SnackBar(
+                                  //           content: Text(
+                                  //               'Please select only one direction.'),
+                                  //           duration: Duration(seconds: 2),
+                                  //         ),
+                                  //       );
+                                  //     } else if (controller.canGoUpValue ||
+                                  //         controller.canGoDownValue) {
+                                  //       // If only one is true, navigate to the next screen
+                                  //       String direction =
+                                  //           controller.canGoUpValue
+                                  //               ? "Up"
+                                  //               : "Down";
+                                  //       print("Direction : $direction");
+                                  //
+                                  //       final result = await Navigator.push(
+                                  //         context,
+                                  //         MaterialPageRoute(
+                                  //           builder: (context) => Ipad16Three(
+                                  //             direction: direction,
+                                  //             startingStationID:
+                                  //                 widget.stationID ?? "",
+                                  //           ),
+                                  //         ),
+                                  //       );
+                                  //
+                                  //       // Process the result received from Ipad16Three
+                                  //       if (result != null) {
+                                  //         // Do something with the returned value
+                                  //         setState(() {
+                                  //           destinationStaionName = result[0];
+                                  //           controller.destinationName =
+                                  //               result[0];
+                                  //           destinationStaionId = result[1];
+                                  //           controller.destinationId =
+                                  //               result[1];
+                                  //         });
+                                  //         print(
+                                  //             "Dest Name $destinationStaionName");
+                                  //         print("Dest Id $destinationStaionId");
+                                  //         ScaffoldMessenger.of(context)
+                                  //           ..removeCurrentSnackBar()
+                                  //           ..showSnackBar(SnackBar(
+                                  //               content: Text("$result")));
+                                  //       }
+                                  //     } else {
+                                  //       ScaffoldMessenger.of(context)
+                                  //           .showSnackBar(
+                                  //         const SnackBar(
+                                  //           content: Text(
+                                  //               'Please select a direction.'),
+                                  //           duration: Duration(seconds: 2),
+                                  //         ),
+                                  //       );
+                                  //     }
+                                  //   },
+                                  //   child: Container(
+                                  //     height: 60.0,
+                                  //     width: 150.0,
+                                  //     decoration: BoxDecoration(
+                                  //         color: Colors.white,
+                                  //         borderRadius:
+                                  //             BorderRadius.circular(10.0)),
+                                  //     alignment: Alignment.center,
+                                  //     child: Text(
+                                  //       destinationStaionName.isNotEmpty
+                                  //           ? destinationStaionName
+                                  //           : "Choose",
+                                  //     ),
+                                  //   ),
+                                  // ),
                                   Container(
                                     height: 60.0,
                                     width: 150.0,
@@ -366,56 +565,69 @@ class _Ipad17State extends State<Ipad17> {
                                   ),
                                   GestureDetector(
                                     onTap: () async {
-                                      // Navigate to Ipad20 and wait for the result
-                                      final result = await Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => Ipad20(
-                                            startingAtStation:
-                                                widget.startingStation ?? "",
-                                            startingAtStationId:
-                                                widget.stationID ?? "",
-                                            destinationStation:
-                                                destinationStaionName,
-                                            destinationStationId:
-                                                destinationStaionId,
+                                      // Check if destinationStationName and destinationStationId are not null
+                                      if (controller.destinationName == null ||
+                                          controller.destinationId == null) {
+                                        // Display a SnackBar or error message if destination details are missing
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                              content: Text(
+                                                  'Please select a valid destination station.')),
+                                        );
+                                      } else {
+                                        // Navigate to Ipad20 and wait for the result if destination details are valid
+                                        final result = await Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => Ipad20(
+                                              startingAtStation:
+                                                  widget.startingStation ?? "",
+                                              startingAtStationId:
+                                                  widget.stationID ?? "",
+                                              destinationStation:
+                                                  destinationStaionName,
+                                              destinationStationId:
+                                                  destinationStaionId,
+                                            ),
                                           ),
-                                        ),
-                                      );
+                                        );
 
-                                      // Check if we received any data back
-                                      if (result != null &&
-                                          result
-                                              is List<Map<String, dynamic>>) {
-                                        stoppingPattern =
-                                            result; // Update the local state with the returned stations
-                                        print("Stopping Pattern");
-                                        print(stoppingPattern);
+                                        // Check if we received any data back
+                                        if (result != null &&
+                                            result
+                                                is List<Map<String, dynamic>>) {
+                                          setState(() {
+                                            stoppingPattern =
+                                                result; // Update the local state with the returned stations
+                                            print("Stopping Pattern");
+                                            print(stoppingPattern);
+                                          });
+                                        }
                                       }
                                     },
-                                    // onTap: () {
-                                    //
-                                    //
-                                    //   Navigator.push(
-                                    //       context,
-                                    //       MaterialPageRoute(
-                                    //           builder: (context) => Ipad20(
-                                    //                 startingAtStation:
-                                    //                     startingStation ?? "",
-                                    //                     startingAtStationId: stationID ?? "",
-                                    //                     destinationStation: destinationStaionName,
-                                    //                     destinationStationId: destinationStaionId,
-                                    //               )));
-                                    // },
                                     child: Container(
                                       height: 60.0,
                                       width: 150.0,
                                       decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(10.0)),
+                                        color: Colors.white,
+                                        borderRadius:
+                                            BorderRadius.circular(10.0),
+                                      ),
                                       alignment: Alignment.center,
-                                      child: const Text("Choose"),
+                                      child: Text(
+                                        stoppingPattern.isEmpty
+                                            ? 'Choose' // At the start or when no stations are selected
+                                            : stoppingPattern.length == 0
+                                                ? '0 Stations' // When stoppingPattern length becomes 0
+                                                : '${stoppingPattern.length} Stations',
+                                        // When stations are selected
+                                        // Show 'Choose' when array is empty
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 16.0,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                   Container(
@@ -437,17 +649,40 @@ class _Ipad17State extends State<Ipad17> {
                           width: MediaQuery.sizeOf(context).width * .33,
                           child: Row(
                             children: [
-                              Container(
-                                height: 130.0,
-                                width: 350.0,
-                                decoration: BoxDecoration(
-                                    color: Colors.yellow,
-                                    borderRadius: BorderRadius.circular(10.0)),
-                                alignment: Alignment.center,
-                                child: Text(
-                                  "DEPART DOWN",
-                                  style: TextStyle(fontSize: 20.0),
-                                ),
+                              Consumer<Ipad17Controller>(
+                                builder: (context, controller, child) {
+                                  return controller.isLoading
+                                      ? const CircularProgressIndicator() // Display loading spinner when loading
+                                      : InkWell(
+                                          onTap: () {
+                                            controller.departNow(
+                                              widget.stationID ?? "",
+                                              controller.upButtonValue == "UP"
+                                                  ? "Up"
+                                                  : "Down",
+                                              destinationStaionId,
+                                              widget.lineID ?? "",
+                                              paxCounter.toString(),
+                                              stoppingPattern,
+                                              context
+                                            );
+                                          },
+                                          child: Container(
+                                            height: 130.0,
+                                            width: 350.0,
+                                            decoration: BoxDecoration(
+                                                color: Colors.yellow,
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                        10.0)),
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              "DEPART DOWN",
+                                              style: TextStyle(fontSize: 20.0),
+                                            ),
+                                          ),
+                                        );
+                                },
                               ),
                             ],
                           ),
@@ -463,14 +698,19 @@ class _Ipad17State extends State<Ipad17> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            Container(
-                              height: 60.0,
-                              width: 150.0,
-                              decoration: BoxDecoration(
-                                  color: Colors.yellow,
-                                  borderRadius: BorderRadius.circular(10.0)),
-                              alignment: Alignment.center,
-                              child: const Text("BACK"),
+                            InkWell(
+                              onTap: () {
+                                Navigator.pop(context);
+                              },
+                              child: Container(
+                                height: 60.0,
+                                width: 150.0,
+                                decoration: BoxDecoration(
+                                    color: Colors.yellow,
+                                    borderRadius: BorderRadius.circular(10.0)),
+                                alignment: Alignment.center,
+                                child: const Text("BACK"),
+                              ),
                             ),
                             Container(
                               height: 100.0,

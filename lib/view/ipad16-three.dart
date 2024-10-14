@@ -123,14 +123,19 @@ class _Ipad16ThreeState extends State<Ipad16Three> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Container(
-                        decoration: BoxDecoration(
-                            color: Colors.yellow,
-                            borderRadius: BorderRadius.circular(10.0)),
-                        width: 200.0,
-                        height: 60.0,
-                        alignment: Alignment.center,
-                        child: const Text("BACK"),
+                      InkWell(
+                        onTap: (){
+                          Navigator.pop(context);
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: Colors.yellow,
+                              borderRadius: BorderRadius.circular(10.0)),
+                          width: 200.0,
+                          height: 60.0,
+                          alignment: Alignment.center,
+                          child: const Text("BACK"),
+                        ),
                       ),
                       GestureDetector(
                         onTap: () async {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nb_utils/nb_utils.dart';
 import 'package:provider/provider.dart';
 import 'package:sunshine_app/components/footer.dart';
 import 'package:sunshine_app/components/header.dart';
@@ -143,15 +144,7 @@ class Ipad16 extends StatelessWidget {
                       children: controller.filteredStations.map((station) {
                         return InkWell(
                           onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => Ipad17(
-                                    startingStation: station.name,
-                                    lineID: station.lineId,
-                                    stationID: station.id,
-                                  ),
-                                ));
+                            controller.changeSelectedStation(station);
                           },
                           child: Container(
                             padding: const EdgeInsets.all(5),
@@ -161,7 +154,9 @@ class Ipad16 extends StatelessWidget {
                             height: 55.0,
                             width: 150.0,
                             decoration: BoxDecoration(
-                              color: Colors.green,
+                              color: controller.selectedStation == station
+                                  ? Colors.red
+                                  : Colors.green,
                               borderRadius: BorderRadius.circular(8.0),
                             ),
                             child: Text(
@@ -187,24 +182,51 @@ class Ipad16 extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
-                  decoration: BoxDecoration(
-                      color: Colors.yellow,
-                      borderRadius: BorderRadius.circular(10.0)),
-                  width: 200.0,
-                  height: 60.0,
-                  alignment: Alignment.center,
-                  child: const Text("BACK"),
+                InkWell(
+                  onTap: (){
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color: Colors.yellow,
+                        borderRadius: BorderRadius.circular(10.0)),
+                    width: 200.0,
+                    height: 60.0,
+                    alignment: Alignment.center,
+                    child: const Text("BACK"),
+                  ),
                 ),
-                Container(
-                  decoration: BoxDecoration(
-                      color: Colors.yellow,
-                      borderRadius: BorderRadius.circular(10.0)),
-                  width: 200.0,
-                  height: 60.0,
-                  alignment: Alignment.center,
-                  child: const Text("NEXT"),
-                )
+                GestureDetector(
+                  onTap: () {
+                    final selectedStation =
+                        Provider.of<Ipad16Controller>(context, listen: false)
+                            .selectedStation;
+
+                    if (selectedStation != null) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Ipad17(
+                            startingStation: selectedStation.name,
+                            lineID: selectedStation.lineId,
+                            stationID: selectedStation.id,
+                          ),
+                        ),
+                      );
+                    } else {
+                      Fluttertoast.showToast(msg: "Please Select a Station First");
+                    }
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color: Colors.yellow,
+                        borderRadius: BorderRadius.circular(10.0)),
+                    width: 200.0,
+                    height: 60.0,
+                    alignment: Alignment.center,
+                    child: const Text("NEXT"),
+                  ),
+                ),
               ],
             ),
           ),
@@ -215,3 +237,4 @@ class Ipad16 extends StatelessWidget {
     );
   }
 }
+

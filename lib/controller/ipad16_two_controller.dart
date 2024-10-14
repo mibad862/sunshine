@@ -16,8 +16,14 @@ class Ipad16TwoController extends ChangeNotifier {
   List<Station> stations = [];
   bool isLoading = false;
   String errorMessage = '';
-
+  Station? selectedStation;
   final logger = Logger();
+
+  void changeSelectedStation(Station station) {
+    selectedStation = station; // Set the selected station
+    logger.d("Selected Station: ${selectedStation?.name}");
+    notifyListeners();
+  }
 
   // Function to fetch station data from the API
   Future<void> fetchStations() async {
@@ -80,3 +86,11 @@ class Ipad16TwoController extends ChangeNotifier {
     }
   }
 }
+
+
+
+
+
+
+
+

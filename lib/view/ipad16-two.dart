@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
+import 'package:nb_utils/nb_utils.dart';
 import 'package:provider/provider.dart';
 import 'package:sunshine_app/components/footer.dart';
 import 'package:sunshine_app/components/header.dart';
@@ -15,6 +17,8 @@ class Ipad16Two extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    final Logger logger;
     return ChangeNotifierProvider(
       create: (context) => Ipad16TwoController(lineID: lineID),
       // Initialize controller with lineID
@@ -60,15 +64,9 @@ class Ipad16Two extends StatelessWidget {
                       children: controller.stations.map((station) {
                         return InkWell(
                           onTap: (){
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => Ipad17(
-                                    startingStation: station.name,
-                                    lineID: station.lineId,
-                                    stationID: station.id,
-                                  ),
-                                ));
+                            controller.changeSelectedStation(station);
+                            print("Station tapped: ${station.name}"); // Debug log
+                            print("Current selected station: ${controller.selectedStation?.name}"); // Debug log
                           },
                           child: Container(
                             padding: const EdgeInsets.all(5),
@@ -78,7 +76,9 @@ class Ipad16Two extends StatelessWidget {
                             height: 48.0,
                             width: 140.0,
                             decoration: BoxDecoration(
-                              color: Colors.green,
+                              color: controller.selectedStation == station
+                                  ? Colors.blue
+                                  : Colors.green,
                               borderRadius: BorderRadius.circular(8.0),
                             ),
                             child: Text(
@@ -117,15 +117,75 @@ class Ipad16Two extends StatelessWidget {
                       child: const Text("BACK"),
                     ),
                   ),
-                  Container(
-                    decoration: BoxDecoration(
-                        color: Colors.yellow,
-                        borderRadius: BorderRadius.circular(10.0)),
-                    width: 200.0,
-                    height: 60.0,
-                    alignment: Alignment.center,
-                    child: const Text("NEXT"),
-                  )
+
+                  Consumer<Ipad16TwoController>(
+                    builder: (context, controller, child) {
+                      return GestureDetector(
+                        onTap: () {
+                          final selectedStation = controller.selectedStation;
+
+                          print("Selected Station before navigation: ${selectedStation?.name}"); // Debug log
+
+                          if (selectedStation != null) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Ipad17(
+                                  startingStation: selectedStation.name,
+                                  lineID: selectedStation.lineId,
+                                  stationID: selectedStation.id,
+                                ),
+                              ),
+                            );
+                          } else {
+                            Fluttertoast.showToast(msg: "Please Select a Station First");
+                          }
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: Colors.yellow,
+                              borderRadius: BorderRadius.circular(10.0)),
+                          width: 200.0,
+                          height: 60.0,
+                          alignment: Alignment.center,
+                          child: const Text("NEXT"),
+                        ),
+                      );
+                    },
+                  ),
+                  // GestureDetector(
+                  //   onTap: () {
+                  //     final selectedStation =
+                  //         Provider.of<Ipad16TwoController>(context, listen: false)
+                  //             .selectedStation;
+                  //
+                  //     print("Selected Station before navigation: ${selectedStation?.name}"); // Debug log
+                  //
+                  //     if (selectedStation != null) {
+                  //       Navigator.push(
+                  //         context,
+                  //         MaterialPageRoute(
+                  //           builder: (context) => Ipad17(
+                  //             startingStation: selectedStation.name,
+                  //             lineID: selectedStation.lineId,
+                  //             stationID: selectedStation.id,
+                  //           ),
+                  //         ),
+                  //       );
+                  //     } else {
+                  //       Fluttertoast.showToast(msg: "Please Select a Station First");
+                  //     }
+                  //   },
+                  //   child: Container(
+                  //     decoration: BoxDecoration(
+                  //         color: Colors.yellow,
+                  //         borderRadius: BorderRadius.circular(10.0)),
+                  //     width: 200.0,
+                  //     height: 60.0,
+                  //     alignment: Alignment.center,
+                  //     child: const Text("NEXT"),
+                  //   ),
+                  // ),
                 ],
               ),
             ),
@@ -137,3 +197,6 @@ class Ipad16Two extends StatelessWidget {
     );
   }
 }
+
+
+

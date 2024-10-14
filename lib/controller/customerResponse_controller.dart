@@ -111,12 +111,15 @@ class CustomerController extends ChangeNotifier {
   // Set Selected Customer Name
   Future<void> setSelectedNameId(String name) async {
     _selectedNameId = name;
+
+    await setValue('customerId', _selectedNameId);
     notifyListeners();
   }
 
   // Set selected time
-  void setSelectedTime(String time) {
+  void setSelectedTime(String time) async{
     _selectedTime = time;
+    await setValue('callOutTime', _selectedTime);
     notifyListeners();
   }
 

@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:sunshine_app/components/footer.dart';
 import 'package:sunshine_app/components/visibility_wrapper.dart';
@@ -95,12 +96,18 @@ class _Ipad12State extends State<Ipad12> {
                 children: [
                   TextButton(
                       onPressed: () {
-                        TimeOfDay currentTime = TimeOfDay.now();
-                        String formattedTime =
-                            '${currentTime.hour}:${currentTime.minute.toString().padLeft(2, '0')}';
-                        log('hehe$formattedTime');
+                        // TimeOfDay currentTime = TimeOfDay.now();
+                        // String formattedTime =
+                        //     '${currentTime.hour}:${currentTime.minute.toString().padLeft(2, '0')}';
+                        //
+                        // log('hehe$formattedTime');
+
+                        String formattedTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
 
                         controller.setSelectedTime(formattedTime);
+
+                        log('hehe$formattedTime');
+
                         Navigator.push(context,
                             MaterialPageRoute(builder: (context) => Ipad13()));
                       },
@@ -176,24 +183,53 @@ class _Ipad12State extends State<Ipad12> {
                           )))),
                   const SizedBox(height: 20.0),
                   TextButton(
-                      onPressed: () {
-                        // Get the entered time from the input fields
-                        String enteredTime =
-                            '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
-                        log('ha${enteredTime}');
-                        _setTimeAndNavigate(controller, enteredTime);
-                      },
-                      child: Container(
-                          height: 90,
-                          width: 200,
-                          decoration: BoxDecoration(
-                              color: Colors.yellow,
-                              borderRadius: BorderRadius.circular(10.0)),
-                          child: Center(
-                              child: const Text(
-                            "Next",
-                            style: TextStyle(color: Colors.black),
-                          ))))
+                    onPressed: () {
+                      // Combine the selected hour and minute with the current date
+                      DateTime now = DateTime.now();
+                      DateTime selectedTime = DateTime(now.year, now.month, now.day, hour, minute);
+
+                      // Format the combined date and time
+                      String formattedTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(selectedTime);
+
+                      log('Selected Time: $formattedTime');
+
+                      _setTimeAndNavigate(controller, formattedTime);
+                    },
+                    child: Container(
+                      height: 90,
+                      width: 200,
+                      decoration: BoxDecoration(
+                        color: Colors.yellow,
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      child: Center(
+                        child: const Text(
+                          "Next",
+                          style: TextStyle(color: Colors.black),
+                        ),
+                      ),
+                    ),
+                  )
+
+                  // TextButton(
+                  //     onPressed: () {
+                  //       // Get the entered time from the input fields
+                  //       String enteredTime =
+                  //           '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
+                  //       log('ha${enteredTime}');
+                  //       _setTimeAndNavigate(controller, enteredTime);
+                  //     },
+                  //     child: Container(
+                  //         height: 90,
+                  //         width: 200,
+                  //         decoration: BoxDecoration(
+                  //             color: Colors.yellow,
+                  //             borderRadius: BorderRadius.circular(10.0)),
+                  //         child: Center(
+                  //             child: const Text(
+                  //           "Next",
+                  //           style: TextStyle(color: Colors.black),
+                  //         ))))
                 ],
               ),
               const SizedBox(height: 30.0),
