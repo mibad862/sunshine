@@ -9,6 +9,8 @@ import 'package:sunshine_app/view/home_screen.dart';
 import 'package:sunshine_app/view/ipad11.dart';
 import 'package:sunshine_app/view/ipad14.dart';
 import 'package:sunshine_app/view/ipad15.dart';
+import 'package:sunshine_app/view/ipad18.dart';
+import 'package:sunshine_app/view/stoppingpattern.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -74,7 +76,7 @@ class MyApp extends StatelessWidget {
               themeMode: value.currentTheme,
               navigatorKey: navigatorKey,
               home: const VisibilityWrapper(
-                bodyScreen: HomeScreen(),
+                bodyScreen: Ipad18(),
               ),
             ),
           );
