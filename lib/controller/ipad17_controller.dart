@@ -262,12 +262,13 @@ class Ipad17Controller extends ChangeNotifier {
     }
   }
 
-
-  Future<void> standBy(String startingStationId, String vehicleId, BuildContext context) async {
+  Future<void> standBy(
+      String startingStationId, String vehicleId, BuildContext context) async {
     const String apiUrl = "https://api.g00r.com.au/API/standBy";
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? driverId = prefs.getString('driver_id');
-    String currentTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
+    String currentTime =
+        DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
 
     final body = {
       "serverKey": AppConfig.serverKey,
