@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:sunshine_app/config/app_config.dart';
+import 'package:sunshine_app/view/ipad19.dart';
 
 import '../view/ipad18.dart';
 
@@ -254,6 +255,74 @@ class Ipad17Controller extends ChangeNotifier {
     } catch (e) {
       errorMessage = 'An error occurred: $e';
       print("errorMessage $e");
+      notifyListeners();
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
+
+  Future<void> standBy(String startingStationId, String vehicleId, BuildContext context) async {
+    const String apiUrl = "https://api.g00r.com.au/API/standBy";
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? driverId = prefs.getString('driver_id');
+    String currentTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
+
+    final body = {
+      "serverKey": AppConfig.serverKey,
+      "startingStationId": startingStationId,
+      "driverId": driverId ?? '1', // Replace with stored driver ID or a default
+      "currentTime": currentTime,
+      "vehicleId": 1,
+    };
+
+    try {
+      isLoading = true;
+      notifyListeners();
+
+      // Fetch token from shared preferences
+      String? token = prefs.getString('auth_token');
+
+      if (token == null) {
+        errorMessage = 'Authentication token not found';
+        isLoading = false;
+        notifyListeners();
+        return;
+      }
+
+      // Make the POST request
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode(body),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        if (data['status'] == 'success') {
+          errorMessage = data['message'];
+          print('Success: ${data['message']}');
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => Ipad19()));
+          notifyListeners();
+        } else {
+          errorMessage = data['message'] ?? 'Error submitting standby request';
+          print('Error: $errorMessage');
+          notifyListeners();
+        }
+      } else {
+        errorMessage = 'HTTP Error: ${response.statusCode}';
+        print('HTTP Error: $errorMessage');
+        notifyListeners();
+      }
+    } catch (e) {
+      errorMessage = 'An error occurred: $e';
+      print("Error: $e");
       notifyListeners();
     } finally {
       isLoading = false;

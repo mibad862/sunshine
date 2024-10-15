@@ -656,16 +656,15 @@ class _Ipad17State extends State<Ipad17> {
                                       : InkWell(
                                           onTap: () {
                                             controller.departNow(
-                                              widget.stationID ?? "",
-                                              controller.upButtonValue == "UP"
-                                                  ? "Up"
-                                                  : "Down",
-                                              destinationStaionId,
-                                              widget.lineID ?? "",
-                                              paxCounter.toString(),
-                                              stoppingPattern,
-                                              context
-                                            );
+                                                widget.stationID ?? "",
+                                                controller.upButtonValue == "UP"
+                                                    ? "Up"
+                                                    : "Down",
+                                                destinationStaionId,
+                                                widget.lineID ?? "",
+                                                paxCounter.toString(),
+                                                stoppingPattern,
+                                                context);
                                           },
                                           child: Container(
                                             height: 130.0,
@@ -712,14 +711,23 @@ class _Ipad17State extends State<Ipad17> {
                                 child: const Text("BACK"),
                               ),
                             ),
-                            Container(
-                              height: 100.0,
-                              width: 250.0,
-                              decoration: BoxDecoration(
-                                  color: Colors.yellow,
-                                  borderRadius: BorderRadius.circular(10.0)),
-                              alignment: Alignment.center,
-                              child: Text("STAND BY"),
+                            InkWell(
+                              onTap: () {
+                                controller.standBy(
+                                  widget.stationID ?? "",
+                                  "1",
+                                  context,
+                                );
+                              },
+                              child: Container(
+                                height: 100.0,
+                                width: 250.0,
+                                decoration: BoxDecoration(
+                                    color: Colors.yellow,
+                                    borderRadius: BorderRadius.circular(10.0)),
+                                alignment: Alignment.center,
+                                child: Text("STAND BY"),
+                              ),
                             ),
                           ],
                         ),

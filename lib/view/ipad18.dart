@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sunshine_app/view/ipad11.dart';
 import '../components/footer.dart';
 import '../components/header.dart';
 import '../components/visibility_wrapper.dart';
@@ -67,7 +68,7 @@ class Ipad18 extends StatelessWidget {
                                       padding: const EdgeInsets.all(16.0),
                                       child: Center(
                                         child: Text(
-                                          data.startingStation,
+                                          data.startingStation ?? "",
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold, fontSize: 20.0),
                                         ),
@@ -95,7 +96,7 @@ class Ipad18 extends StatelessWidget {
                                       padding: const EdgeInsets.all(16.0),
                                       child: Center(
                                         child: Text(
-                                          data.nextStation,
+                                          data.nextStation ?? "",
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold, fontSize: 20.0),
                                         ),
@@ -174,7 +175,7 @@ class Ipad18 extends StatelessWidget {
                       ],
                     ),
                     Text(
-                      data.reason,
+                      data.reason ?? "",
                       style: TextStyle(fontSize: 24.0),
                     ),
                     SizedBox(
@@ -202,7 +203,7 @@ class Ipad18 extends StatelessWidget {
                                       padding: const EdgeInsets.all(16.0),
                                       child: Center(
                                         child: Text(
-                                          data.destinationStation,
+                                          data.destinationStation ?? "",
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold, fontSize: 20.0),
                                         ),
@@ -245,6 +246,7 @@ class Ipad18 extends StatelessWidget {
                         SizedBox(
                           width: 240.0,
                         ),
+                        if(int.parse(data.nextStationId) != 0)
                         InkWell(
                           onTap: (){
                             provider.arrivedStation(
@@ -299,18 +301,33 @@ class Ipad18 extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                                Container(
-                                  decoration: BoxDecoration(
-                                      color: Colors.blue,
-                                      borderRadius: BorderRadius.circular(10.0)),
-                                  child: Padding(
-                                    padding: EdgeInsets.all(16.0),
-                                    child: Center(
-                                      child: Text(
-                                        "END TRIP",
-                                        style: TextStyle(
-                                            fontSize: 20.0, fontWeight: FontWeight.bold),
-                                        textAlign: TextAlign.center,
+                                InkWell(
+                                  onTap: () async{
+                                    await provider.endTrip(data.emergencyCallOutId); // Call the API to end the trip
+                                    if (provider.errorMessage.isEmpty) {
+                                      // If no error, navigate to the next screen
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => Ipad11()), // Replace with your desired screen
+                                      );
+                                    } else {
+                                      // Handle error (show a message, etc.)
+                                      print(provider.errorMessage);
+                                    }
+                                  },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        color: Colors.blue,
+                                        borderRadius: BorderRadius.circular(10.0)),
+                                    child: Padding(
+                                      padding: EdgeInsets.all(16.0),
+                                      child: Center(
+                                        child: Text(
+                                          "END TRIP",
+                                          style: TextStyle(
+                                              fontSize: 20.0, fontWeight: FontWeight.bold),
+                                          textAlign: TextAlign.center,
+                                        ),
                                       ),
                                     ),
                                   ),
