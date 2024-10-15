@@ -3,7 +3,9 @@ import 'package:provider/provider.dart';
 import 'package:sunshine_app/colors/colors.dart';
 import 'package:sunshine_app/components/footer.dart';
 import 'package:sunshine_app/components/header.dart';
+import 'package:sunshine_app/components/visibility_wrapper.dart';
 import 'package:sunshine_app/controller/home_controller.dart';
+import 'package:sunshine_app/controller/motion_detection_controller.dart';
 import 'package:sunshine_app/view/password_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -14,28 +16,9 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // Define a list of colors for different containers
-  final List<Color> containerColors = [
-    Colors.red,
-    Colors.blue,
-    Colors.green,
-    Colors.orange,
-    Colors.purple,
-  ];
-  final List<String> drivers = [
-    'Adam Taylor',
-    'Umair',
-    'Rafay',
-    'Ismail',
-    'Rauf'
-  ];
-  final List<String> faults = [
-    'Puncture',
-    'Headlight Left',
-    'Ac Issue',
-    'Air Filter',
-    'Engine Oil'
-  ];
+  final ScrollController _scrollController =
+      ScrollController(); // Add ScrollController
+
   @override
   void initState() {
     final pro = Provider.of<HomeController>(context, listen: false);
@@ -44,28 +27,35 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
+  void dispose() {
+    _scrollController
+        .dispose(); // Dispose the controller when the widget is disposed
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Consumer<HomeController>(
-      builder: (context, homeController, child) => Scaffold(
-        appBar: AppBar(
-          toolbarHeight: 30.0,
-        ),
-        body: Column(
-          children: [
-             Header(),
-            const SizedBox(height: 25.0),
-            Expanded(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildDriverList(homeController),
-                  const Spacer(),
-                  _buildVehicleStatus(homeController),
-                ],
+    return VisibilityWrapper(
+      bodyScreen: Consumer<HomeController>(
+        builder: (context, homeController, child) => Scaffold(
+          body: Column(
+            children: [
+              const SizedBox(height: 20.0),
+              Header(),
+              const SizedBox(height: 25.0),
+              Expanded(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildDriverList(homeController),
+                    const Spacer(),
+                    _buildVehicleStatus(homeController),
+                  ],
+                ),
               ),
-            ),
-            const Footer(isShowSettings: true),
-          ],
+              const Footer(isShowSettings: true),
+            ],
+          ),
         ),
       ),
     );
@@ -86,7 +76,8 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 10.0),
             Divider(thickness: 5.0),
             const SizedBox(height: 10.0),
-            Expanded(
+            SizedBox(
+              height: MediaQuery.sizeOf(context).height * 0.35,
               child: _buildDriverListView(homeController),
             ),
             const SizedBox(height: 15.0),
@@ -137,10 +128,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildVehicleStatus(HomeController homeController) {
-    return Flexible(
-      flex: 3,
+    return SizedBox(
+      width: MediaQuery.sizeOf(context).width * 0.3,
       child: Padding(
-        padding: const EdgeInsets.all(15.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -151,7 +142,8 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 5.0),
             Divider(thickness: 5.0),
             const SizedBox(height: 5.0),
-            Expanded(
+            SizedBox(
+              height: MediaQuery.sizeOf(context).height * 0.35,
               child: _buildVehicleStatusListView(homeController),
             ),
             const SizedBox(height: 15.0),
@@ -209,48 +201,56 @@ class _HomeScreenState extends State<HomeScreen> {
             ? const Center(
                 child: Text("No drivers found..."),
               )
-            : ListView.builder(
-                shrinkWrap: true,
-                itemCount: homeController.dashboardData!.drivers.length,
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PasswordScreen(
-                            driverId: homeController
-                                .dashboardData!.drivers[index].id
-                                .toString(),
-                            driverName:
-                                "${homeController.dashboardData!.drivers[index].firstName} ${homeController.dashboardData!.drivers[index].lastName}",
+            : Scrollbar(
+                thickness: 8.0,
+                trackVisibility: true,
+                interactive: true,
+                controller: _scrollController,
+                thumbVisibility: true,
+                child: ListView.builder(
+                  controller: _scrollController,
+                  shrinkWrap: true,
+                  itemCount: homeController.dashboardData!.drivers.length,
+                  itemBuilder: (context, index) {
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PasswordScreen(
+                              driverId: homeController
+                                  .dashboardData!.drivers[index].id
+                                  .toString(),
+                              driverName:
+                                  "${homeController.dashboardData!.drivers[index].firstName} ${homeController.dashboardData!.drivers[index].lastName}",
+                            ),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(vertical: 5),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5.0),
+                          color: homeController
+                                      .dashboardData!.drivers[index].color ==
+                                  "dark"
+                              ? AppColors.secondaryColor
+                              : AppColors.primaryColor,
+                        ),
+                        height: 40,
+                        alignment: Alignment.center,
+                        child: Text(
+                          "${homeController.dashboardData!.drivers[index].firstName} ${homeController.dashboardData!.drivers[index].lastName}",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
-                      );
-                    },
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(vertical: 5),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5.0),
-                        color: homeController
-                                    .dashboardData!.drivers[index].color ==
-                                "dark"
-                            ? AppColors.secondaryColor
-                            : AppColors.primaryColor,
                       ),
-                      height: 40,
-                      alignment: Alignment.center,
-                      child: Text(
-                        "${homeController.dashboardData!.drivers[index].firstName} ${homeController.dashboardData!.drivers[index].lastName}",
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               );
   }
 
@@ -290,38 +290,5 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 },
               );
-  }
-}
-
-class moreDetails extends StatelessWidget {
-  String category;
-  String value;
-  moreDetails({
-    required this.category,
-    required this.value,
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          category,
-          style: const TextStyle(
-              //     color: Color(0xff003b5c),
-              fontSize: 18.0,
-              fontWeight: FontWeight.bold),
-        ),
-        Text(
-          value,
-          style: const TextStyle(
-              //    color: Color(0xff003b5c),
-              fontSize: 14.0,
-              fontWeight: FontWeight.normal),
-        )
-      ],
-    );
   }
 }

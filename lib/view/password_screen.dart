@@ -56,17 +56,19 @@ class _PasswordScreenState extends State<PasswordScreen> {
         DateFormat('yyyy-MM-dd – kk:mm').format(DateTime.now());
 
     return Scaffold(
-      appBar: AppBar(),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-           Header(),
+          const SizedBox(
+            height: 20.0,
+          ),
+          Header(),
           /* Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text("Sunshine Scenic Tours", style: currentTextStyle),
               Text(currentDateTime, style: currentTextStyle),
-              Text("8446AO", style: currentTextStyle),
+              Text("8441AO", style: currentTextStyle),
             ],
           ),*/
           const SizedBox(
@@ -83,7 +85,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
                 style:
                     currentTextStyle.copyWith(color: AppColors.primaryColor)),
           ])),
-      
+
           const SizedBox(
             height: 25.0,
           ),
@@ -111,8 +113,8 @@ class _PasswordScreenState extends State<PasswordScreen> {
               ),
             ),
           ),
-        //  SizedBox(height: 20),
-      
+          SizedBox(height: 20),
+
           // Numeric keypad (1-9)
           Expanded(
             child: Column(
@@ -120,16 +122,16 @@ class _PasswordScreenState extends State<PasswordScreen> {
               children: [
                 // First Row of Digits
                 _buildButtonRow(['1', '2', '3']),
-               // const SizedBox(height: 20),
-      
+                const SizedBox(height: 20),
+
                 // Second Row of Digits
                 _buildButtonRow(['4', '5', '6']),
-               // const SizedBox(height: 20),
-      
+                const SizedBox(height: 20),
+
                 // Third Row of Digits
                 _buildButtonRow(['7', '8', '9']),
-               // const SizedBox(height: 50),
-      
+                const SizedBox(height: 20),
+
                 // Cancel Button (acting as backspace)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -138,13 +140,25 @@ class _PasswordScreenState extends State<PasswordScreen> {
                       onPressed: _onCancelPress,
                       style: ElevatedButton.styleFrom(
                         fixedSize: Size(180, 80),
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 50, vertical: 15),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                         backgroundColor: Colors.red,
                       ),
                       child: const Text(
-                        'Cancel',
+                        'Delete',
                         style: TextStyle(fontSize: 18, color: Colors.white),
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: () => _onDigitPress("0"),
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(160.0, 80.0),
+                        padding: const EdgeInsets.all(20), // Adjust button size
+                      ),
+                      child: const Text(
+                        "0",
+                        style:
+                            const TextStyle(fontSize: 24, color: Colors.blue),
                       ),
                     ),
                     ElevatedButton(
@@ -163,9 +177,37 @@ class _PasswordScreenState extends State<PasswordScreen> {
                         backgroundColor: Colors.green,
                       ),
                       child: const Text(
-                        'Okay',
+                        'OK',
                         style: TextStyle(fontSize: 18, color: Colors.white),
                       ),
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 40.0,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    SizedBox(),
+                    SizedBox(),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        fixedSize: Size(180, 80),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 50, vertical: 15),
+                        backgroundColor: Colors.blue,
+                      ),
+                      child: const Text(
+                        'Cancel',
+                        style: TextStyle(fontSize: 18, color: Colors.white),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 40.0,
                     ),
                   ],
                 ),
@@ -189,12 +231,12 @@ class _PasswordScreenState extends State<PasswordScreen> {
         return ElevatedButton(
           onPressed: () => _onDigitPress(digit),
           style: ElevatedButton.styleFrom(
-            minimumSize: Size(160.0, 80.0),
+            minimumSize: const Size(160.0, 80.0),
             padding: const EdgeInsets.all(20), // Adjust button size
           ),
           child: Text(
             digit,
-            style: const TextStyle(fontSize: 24),
+            style: const TextStyle(fontSize: 24, color: Colors.blue),
           ),
         );
       }).toList(),

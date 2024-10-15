@@ -183,7 +183,7 @@ class Ipad16 extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 InkWell(
-                  onTap: (){
+                  onTap: () {
                     Navigator.pop(context);
                   },
                   child: Container(
@@ -214,7 +214,8 @@ class Ipad16 extends StatelessWidget {
                         ),
                       );
                     } else {
-                      Fluttertoast.showToast(msg: "Please Select a Station First");
+                      Fluttertoast.showToast(
+                          msg: "Please Select a Station First");
                     }
                   },
                   child: Container(
@@ -237,4 +238,3 @@ class Ipad16 extends StatelessWidget {
     );
   }
 }
-

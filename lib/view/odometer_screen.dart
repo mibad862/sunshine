@@ -1,143 +1,320 @@
 import 'package:flutter/material.dart';
+import 'package:nb_utils/nb_utils.dart';
+import 'package:provider/provider.dart';
 import 'package:sunshine_app/components/footer.dart';
 import 'package:sunshine_app/components/header.dart';
 import 'package:sunshine_app/components/visibility_wrapper.dart';
-import 'package:sunshine_app/view/refuel.dart';
+import 'package:sunshine_app/controller/driver_portal_controller.dart';
+import 'package:sunshine_app/controller/ipad8_controller.dart';
+import 'package:sunshine_app/view/ipad3.dart';
 
-class OdometerScreen extends StatelessWidget {
-  const OdometerScreen({Key? key}) : super(key: key);
+class OdometerScreen extends StatefulWidget {
+  const OdometerScreen({super.key});
+
+  @override
+  State<OdometerScreen> createState() => _OdometerScreenState();
+}
+
+class _OdometerScreenState extends State<OdometerScreen> {
+  // Initial 7 digit value
+  List<int> counterDigits =
+      List.generate(7, (index) => 0); // Initialize with zeros
+  String updatedCounterValue = ''; // To store updated counter value as a string
+  String initialCounterValue = ''; // Store the initial odometer reading
+  bool _hasConfirmedLowerValue = false;
+
+  @override
+  void initState() {
+    final pro = Provider.of<Ipad8Controller>(context, listen: false);
+    // Fetch the previous odometer reading from API
+    pro.getPrevOdometerReadings(vehicleId: "1", context: context).then((value) {
+      if (value != null && value.isNotEmpty) {
+        // Parse the string from API to List<int>
+        setState(() {
+          counterDigits =
+              value.split('').map((digit) => int.parse(digit)).toList();
+          initialCounterValue = value;
+        });
+      }
+    });
+    super.initState();
+  }
+
+  // Function to validate and update the counter string
+  void validateAndUpdateCounterString() {
+    String newValue = counterDigits.join('');
+
+    if (newValue.length == initialCounterValue.length) {
+      int newInt = int.parse(newValue);
+      int initialInt = int.parse(initialCounterValue);
+
+      if (newInt < initialInt && !_hasConfirmedLowerValue) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Warning'),
+              content: Text(
+                  'Are you sure you want to enter a value less than the initial odometer reading?'),
+              actions: [
+                TextButton(
+                  child: Text('No'),
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                    setState(() {
+                      counterDigits = initialCounterValue
+                          .split('')
+                          .map((digit) => int.parse(digit))
+                          .toList();
+                    });
+                  },
+                ),
+                TextButton(
+                  child: Text('Yes'),
+                  onPressed: () {
+                    setState(() {
+                      updatedCounterValue = newValue;
+                      _hasConfirmedLowerValue =
+                          true; // Set flag to remember confirmation
+                    });
+                    Navigator.of(context).pop(true);
+                  },
+                ),
+              ],
+            );
+          },
+        ).then((value) {
+          if (value ?? false) {
+            setState(() {
+              updatedCounterValue = newValue;
+            });
+          }
+        });
+      } else {
+        setState(() {
+          updatedCounterValue = newValue;
+        });
+      }
+    } else {
+      setState(() {
+        updatedCounterValue = newValue;
+      });
+    }
+  }
+
+  // Function to increment the counter at a specific position
+  void incrementDigit(int index) {
+    setState(() {
+      counterDigits[index]++;
+      if (counterDigits[index] > 9) {
+        counterDigits[index] = 0;
+        // Carry over to the next digit
+        if (index > 0) incrementDigit(index - 1);
+      }
+      // Update the string representation of the counter
+      validateAndUpdateCounterString();
+    });
+  }
+
+  // Function to decrement the counter at a specific position
+  void decrementDigit(int index) {
+    setState(() {
+      counterDigits[index]--;
+      if (counterDigits[index] < 0) {
+        counterDigits[index] = 9;
+        // Borrow from the next digit
+        if (index > 0) decrementDigit(index - 1);
+      }
+      // Update the string representation of the counter
+      validateAndUpdateCounterString();
+    });
+  }
+
+  // Function to convert the counter list to string and save it
+  void updateCounterString() {
+    updatedCounterValue = counterDigits.join('');
+    print(
+        "Updated Odometer Value: $updatedCounterValue"); // You can save this value
+  }
 
   @override
   Widget build(BuildContext context) {
-    return VisibilityWrapper(bodyScreen: Scaffold(
-      backgroundColor: Colors.grey,
-      body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16.0),
-        child: Center(
-          child: Column(
-            
-            children: [
-              const SizedBox(height: 30.0,),
-               Header(
-  navigation: () {
-    Navigator.push(
-      context, 
-      MaterialPageRoute(builder: (context) => Refuel())
-    );
-  },
-),
-               SizedBox(height: MediaQuery.sizeOf(context).height*.09,),
-              const Text(
-                'Odometer Reading',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: MediaQuery.sizeOf(context).height*.09),
-              SizedBox(
-                width: 550, // Increased width to accommodate spacing
-                height: 250,
-                child: CustomPaint(
-                  painter: OdometerPainter(),
-                ),
-              ),
-               SizedBox(height: MediaQuery.sizeOf(context).height*.07),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+    return VisibilityWrapper(
+      bodyScreen: Consumer<Ipad8Controller>(
+        builder: (context, ipad8Controller, child) => Scaffold(
+          body: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16.0),
+            child: Center(
+              child: Column(
                 children: [
-        
-        Container(height: 60,width: 200,
-        decoration: BoxDecoration(
-          color: Colors.yellow,
-          borderRadius: BorderRadius.circular(10.0)
-        ),
-        child: const Center(
-          child: Text("Back"),
-        ),
-        ),
-        const SizedBox(width: 60.0,),
-        Container(height: 60,width: 200,
-        decoration: BoxDecoration(
-          color: Colors.yellow,
-          borderRadius: BorderRadius.circular(10.0)
-        ),
-        child: const Center(child: Text("Confirm"),),
-        ),
-        const SizedBox(width: 100.0,),
-              ],),
-               SizedBox(height: MediaQuery.sizeOf(context).height*.11),
-              const Footer(isShowSettings: true),
-            ],
+                  const SizedBox(height: 30.0),
+                  Header(),
+                  const SizedBox(height: 30),
+                  const Text(
+                    'Odometer Reading',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(
+                    height: 422,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: List.generate(counterDigits.length, (index) {
+                        return CounterWidget(
+                          value: counterDigits[index],
+                          onIncrement: () => incrementDigit(index),
+                          onDecrement: () => decrementDigit(index),
+                        );
+                      }),
+                    ),
+                  ),
+                  SizedBox(height: MediaQuery.sizeOf(context).height * .03),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Container(
+                        height: 60,
+                        width: 200,
+                        decoration: BoxDecoration(
+                          color: const Color.fromARGB(255, 133, 201, 233),
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        child: const Center(
+                            child: Text(
+                          "Back",
+                          style: TextStyle(
+                              fontSize: 24.0, fontWeight: FontWeight.bold),
+                        )),
+                      ),
+                      const SizedBox(width: 60.0),
+                      InkWell(
+                        onTap: () async {
+                          bool? result = await showDialog<bool>(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('Clock Off Confirmation'),
+                                content:
+                                    Text('Are you sure you want to clock off?'),
+                                actions: [
+                                  TextButton(
+                                    child: Text('No'),
+                                    onPressed: () {
+                                      Navigator.of(context).pop(false);
+                                    },
+                                  ),
+                                  TextButton(
+                                    child: Text('Yes'),
+                                    onPressed: () {
+                                      Navigator.of(context).pop(true);
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+
+                          if (result != null && result) {
+                            String driverId = getStringAsync("driver_id");
+
+                            // Clock off logic here
+                            final pro = Provider.of<DriverPortalController>(
+                                context,
+                                listen: false);
+                            await pro
+                                .clockOff(
+                                    driverId: driverId,
+                                    vehicleId: "1",
+                                    context: context)
+                                .then(
+                              (value) {
+                                // Navigate back to IPAD 3
+                                Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => UserStatus(),
+                                    ));
+                              },
+                            );
+                          } else if (result == false) {
+                            // Return to IPAD 3 without clocking off
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => UserStatus(),
+                                ));
+                          }
+                        },
+                        child: Container(
+                          height: 60,
+                          width: 200,
+                          decoration: BoxDecoration(
+                            color: const Color.fromARGB(255, 133, 201, 233),
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          child: const Center(
+                              child: Text(
+                            "Confirm",
+                            style: TextStyle(
+                                fontSize: 24.0, fontWeight: FontWeight.bold),
+                          )),
+                        ),
+                      ),
+                      const SizedBox(width: 100.0),
+                    ],
+                  ),
+                  SizedBox(height: MediaQuery.sizeOf(context).height * .11),
+                  const Footer(isShowSettings: true),
+                ],
+              ),
+            ),
           ),
         ),
       ),
-     ) );
+    );
   }
 }
 
-class OdometerPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    // Paint object for red triangles
-    final trianglePaint = Paint()
-      ..color = Colors.blue.withOpacity(0.7) // Red for triangles
-      ..strokeWidth = 2
-      ..style = PaintingStyle.fill;
+class CounterWidget extends StatelessWidget {
+  final int value;
+  final VoidCallback onIncrement;
+  final VoidCallback onDecrement;
 
-    // Paint object for yellow boxes
-    final boxPaint = Paint()
-      ..color = Colors.white // Yellow for boxes
-      ..strokeWidth = 2
-      ..style = PaintingStyle.fill;
-
-    final triangleHeight = size.height / 4;
-    final triangleWidth = size.width / 7;
-    final containerHeight = size.height / 4;
-    final spacing = 10.0; // Spacing between triangles and boxes
-
-    // Adjusted triangle width for spacing
-    final adjustedWidth = (size.width - (6 * spacing)) / 7;
-
-    // Drawing top triangles (with spacing)
-    for (int i = 0; i < 7; i++) {
-      final path = Path();
-      final startX = i * (adjustedWidth + spacing);
-      path.moveTo(startX + adjustedWidth / 2, 0); // Top center
-      path.lineTo(startX, triangleHeight);         // Bottom left
-      path.lineTo(startX + adjustedWidth, triangleHeight); // Bottom right
-      path.close();
-      canvas.drawPath(path, trianglePaint); // Use trianglePaint for red triangles
-    }
-
-    // Drawing containers (with spacing)
-    for (int i = 0; i < 7; i++) {
-      final startX = i * (adjustedWidth + spacing);
-      final rect = Rect.fromLTWH(
-        startX,
-        triangleHeight + spacing, // Spacing below the top triangles
-        adjustedWidth,
-        containerHeight,
-      );
-      canvas.drawRect(rect, boxPaint); // Use boxPaint for yellow boxes
-    }
-
-    // Drawing bottom triangles (with spacing)
-    // Adding similar spacing below the containers like the top triangles
-    for (int i = 0; i < 7; i++) {
-      final path = Path();
-      final startX = i * (adjustedWidth + spacing);
-      // The bottom triangles should start after the containers, with added spacing
-      final bottomYStart = triangleHeight + spacing + containerHeight + spacing; 
-
-      path.moveTo(startX + adjustedWidth / 2, bottomYStart + triangleHeight); // Bottom center of the triangle
-      path.lineTo(startX, bottomYStart);    // Top left of the triangle
-      path.lineTo(startX + adjustedWidth, bottomYStart); // Top right of the triangle
-      path.close();
-      canvas.drawPath(path, trianglePaint); // Use trianglePaint for red triangles
-    }
-  }
+  const CounterWidget({
+    super.key,
+    required this.value,
+    required this.onIncrement,
+    required this.onDecrement,
+  });
 
   @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    return false;
-  
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        IconButton(
+          padding: EdgeInsets.zero,
+          color: Colors.blue,
+          icon: const Icon(Icons.arrow_drop_up, size: 140),
+          onPressed: onIncrement,
+        ),
+        Container(
+          width: 80,
+          height: 80,
+          color: Colors.yellow,
+          child: Center(
+            child: Text(
+              '$value',
+              style: const TextStyle(fontSize: 40, color: Colors.black),
+            ),
+          ),
+        ),
+        IconButton(
+          padding: EdgeInsets.zero,
+          color: Colors.blue,
+          icon: const Icon(Icons.arrow_drop_down, size: 140),
+          onPressed: onDecrement,
+        ),
+      ],
+    );
   }
 }

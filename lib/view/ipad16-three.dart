@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:logger/logger.dart';
+
 import 'package:nb_utils/nb_utils.dart';
 import 'package:provider/provider.dart';
 import 'package:sunshine_app/components/footer.dart';
@@ -82,7 +82,8 @@ class _Ipad16ThreeState extends State<Ipad16Three> {
                                         controller.selectStationId(
                                           station.stationId ?? 1,
                                         );
-                                        logger.d("Tapped station: ${station.name}, ID: ${station.stationId}");
+                                        logger.d(
+                                            "Tapped station: ${station.name}, ID: ${station.stationId}");
                                       },
                                       child: Container(
                                         padding: const EdgeInsets.all(5),
@@ -124,7 +125,7 @@ class _Ipad16ThreeState extends State<Ipad16Three> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       InkWell(
-                        onTap: (){
+                        onTap: () {
                           Navigator.pop(context);
                         },
                         child: Container(
@@ -156,7 +157,8 @@ class _Ipad16ThreeState extends State<Ipad16Three> {
                               setState(() {
                                 // Navigator.pop(context);
 
-                                logger.d("Passing station ID: ${controller.startingStationId}");
+                                logger.d(
+                                    "Passing station ID: ${controller.startingStationId}");
 
                                 Navigator.pop(context, [
                                   controller.selectedStationName,
