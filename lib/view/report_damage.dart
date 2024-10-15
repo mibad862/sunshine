@@ -8,31 +8,35 @@ class ReportDamage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
+    return Scaffold(
       appBar: AppBar(),
-      body:  Stack(
+      body: Stack(
         children: [
-          Align(alignment: Alignment.topCenter,child:   Header(
-  navigation: () {
-    Navigator.push(
-      context, 
-      MaterialPageRoute(builder: (context) => const MessageOperator())
-    );
-  },
-),),
-        
-         const Column(
-        
-           children: [
-            SizedBox(height: 40.0,),
-             Center(child: Text("Report Damage",style: TextStyle(fontSize: 36.0,fontWeight: FontWeight.bold),)),
-           ],
-         ),
+          Align(
+            alignment: Alignment.topCenter,
+            child: Header(
+              navigation: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const MessageOperator()));
+              },
+            ),
+          ),
+          const Column(
+            children: [
+              SizedBox(
+                height: 40.0,
+              ),
+              Center(
+                  child: Text(
+                "Report Damage",
+                style: TextStyle(fontSize: 36.0, fontWeight: FontWeight.bold),
+              )),
+            ],
+          ),
           const Positioned(
-          bottom: 0,
-          right: 0,
-          left: 0,
-            child: Footer(isShowSettings: true))
+              bottom: 0, right: 0, left: 0, child: Footer(isShowSettings: true))
         ],
       ),
     );
